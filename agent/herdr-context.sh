@@ -5,7 +5,7 @@ cli="${1:-}"
 [ -n "${HC_TERMINAL_ID:-}" ] || exit 0
 command -v herdr-app >/dev/null 2>&1 && command -v hc >/dev/null 2>&1 || exit 0
 case "$cli" in
-  claude) [ "${CLAUDE_CODE_ENTRYPOINT:-cli}" = cli ] || exit 0
+  claude) case "${CLAUDE_CODE_ENTRYPOINT:-cli}" in cli|sdk-cli) ;; *) exit 0 ;; esac
     pre='{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"'; post='"}}' ;;
   copilot) pre='{"additionalContext":"'; post='"}' ;;
   *) exit 0 ;;

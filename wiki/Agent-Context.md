@@ -24,4 +24,4 @@ It prints nothing and exits 0 when any of these is true:
 
 - `HC_TERMINAL_ID` is not set (not in Herdr).
 - `herdr-app` or `hc` is missing.
-- For Claude, `CLAUDE_CODE_ENTRYPOINT` is set to something other than `cli`.
+- For Claude, `CLAUDE_CODE_ENTRYPOINT` is set to something other than `cli` or `sdk-cli`. `sdk-cli` is `claude -p` in a terminal; the desktop app (`claude-desktop`) stays silent.

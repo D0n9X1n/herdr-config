@@ -38,3 +38,20 @@ scripts/set-app-icon.sh --restart-dock
 A Herdr update replaces the app and resets the icon, so run it again after each update.
 
 `codesign --verify --strict` then reports "Finder information" detritus. That is expected: `spctl` (Gatekeeper) still accepts the notarized app.
+
+## Windows
+
+On Windows the Herdr home is `~/.config/herdr-app` in your user folder. Copy the same files from PowerShell. The Windows keymap goes in as `keys.json`:
+
+```powershell
+$H = "$HOME\.config\herdr-app"
+Copy-Item layouts\apollo.json, layouts\apollo.svg "$H\layouts\"
+Copy-Item themes\apollo.json "$H\themes\"
+Copy-Item -Recurse -Force mods\apollo-* "$H\mods\"
+Copy-Item user\keys.windows.json "$H\keys.json"
+herdr-app do layout.switch '{"name":"apollo"}'
+```
+
+`herdr-app.exe` is a window app: PowerShell doesn't wait for it or show its output. Run the `herdr-app check` loop above from Git Bash.
+
+Apollo hides the system title bar, and on Windows Herdr then draws no window buttons. So `apollo-tabs` draws minimize, maximize and close at the right end of the tab row, wherever `window().buttons` is true (Windows and Linux). Maximize shows a restore icon while the window is maximized. macOS keeps its traffic lights and draws nothing new.

@@ -92,8 +92,9 @@ function findNode(n, id) {
 // ⊕'s window position comes from the layout: the tabs block starts at sidebar px (clamped to its min/max,
 // as Herdr renders it) + main padding + card border; inside it the root has 8 px side padding, ⊕ is
 // 28 px, vertically centered, 4 px left of the measured `panels` group. Null until both are measured.
+// With window buttons (buttonsW > 0) the root's right padding gives way to them and a 4 px gap.
 export const PLUS_MENU_W = 220;
-export function plusAnchor({ layout, rootW, panelsW }) {
+export function plusAnchor({ layout, rootW, panelsW, buttonsW = 0 }) {
   const side = findNode(layout, "sidebar"), main = findNode(layout, "main"), card = findNode(layout, "card");
   const tabs = findNode(layout, "tabs");
   if (!side || !main || !card || !tabs || !(rootW > 0) || !(panelsW > 0)) return null;
@@ -101,7 +102,7 @@ export function plusAnchor({ layout, rootW, panelsW }) {
   const sidebar = Math.min(side.max ?? px, Math.max(side.min ?? px, px));
   const pad = main.padding ?? 0, border = card.border?.width ?? 0, tabsH = tabs.size?.px ?? 40;
   const left = sidebar + pad + border, top = pad + border;
-  const plusRight = left + rootW - 8 - panelsW - 4;
+  const plusRight = left + rootW - (buttonsW > 0 ? buttonsW + 4 : 8) - panelsW - 4;
   const plusBottom = top + (tabsH - 28) / 2 + 28;
   return { x: plusRight - PLUS_MENU_W, y: plusBottom + 4 };
 }
@@ -132,4 +133,19 @@ export function panelClick(child, state, { run }) {
   } else {
     run("layout.hide", { id: "panel" });
   }
+}
+
+// ---- Windows and Linux: window buttons ----
+// With "titlebar": "none", macOS keeps its traffic lights; where the system draws no buttons
+// (window().buttons, Windows and Linux) the tab row draws minimize, maximize/restore and close.
+
+export const WIN_BUTTON_W = 46;
+
+export function windowButtons(win) {
+  if (!win || win.buttons !== true) return [];
+  return [
+    { id: "minimize", icon: "win-min", command: "window.minimize", danger: false },
+    { id: "maximize", icon: win.maximized ? "win-restore" : "win-max", command: "window.maximize", danger: false },
+    { id: "close", icon: "win-close", command: "window.close", danger: true },
+  ];
 }

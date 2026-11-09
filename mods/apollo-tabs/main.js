@@ -1,14 +1,14 @@
 // apollo-tabs: the tab pills, + button and panel buttons at the top of the work card, and the + popup
-// (props.menu === "plus"). Logic lives in lib.js.
+// (props.menu === "plus"). On Windows and Linux the row ends with the window buttons. Logic lives in lib.js.
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import {
   spaces, panes, run, openOverlay, closeOverlay, nextCommand, knownAgents, layout, readTextFile, appHome, theme,
-  props as herdrProps,
+  props as herdrProps, window as herdrWindow,
 } from "herdr";
 import {
   activeSpace, tabPills, selectTab, closeTab, onWheel, handleCommand, loadAgents, plusMenu, pickPlus,
-  panelState, loadPanelState, panelClick, plusAnchor, PLUS_MENU_W,
+  panelState, loadPanelState, panelClick, plusAnchor, PLUS_MENU_W, windowButtons, WIN_BUTTON_W,
 } from "./lib.js";
 
 const FALLBACK = {
@@ -20,6 +20,7 @@ const glyph = (name, size, color) => svg(`mods/apollo-tabs/${name}.svg`).size(si
 const MARKS = { working: "arc", blocked: "diamond", done: "check" };
 const PANELS = [["files", "Files"], ["changes", "Changes"], ["specs", "Specs"]];
 const stop = (_e, cx) => cx.stop_propagation(); // the tab row is a window_drag block
+const CLOSE_RED = "#c42b1c"; // the Windows close-button hover
 
 export default class Tabs extends View {
   // Props are read live: Herdr's props() merged with whatever init received (it may be nothing or {}).
@@ -46,7 +47,8 @@ export default class Tabs extends View {
   openPlus() {
     const sp = activeSpace(spaces());
     if (!sp) return;
-    const at = plusAnchor({ layout: layout(), rootW: this.rootW, panelsW: this.panelsW });
+    const buttonsW = windowButtons(herdrWindow()).length * WIN_BUTTON_W;
+    const at = plusAnchor({ layout: layout(), rootW: this.rootW, panelsW: this.panelsW, buttonsW });
     openOverlay({ mod: "apollo-tabs", kind: "popup", width: PLUS_MENU_W, ...(at ? { at } : {}), props: { menu: "plus", space: sp.id } });
   }
 
@@ -84,6 +86,17 @@ export default class Tabs extends View {
     return el;
   }
 
+  // Minimize, maximize/restore and close: full height, flush with the card's top-right corner.
+  windowButton(b) {
+    let el = h_flex().id(`win-${b.id}`).w(WIN_BUTTON_W).h_full().flex_none().items_center().justify_center()
+      .on_mouse_down("left", stop)
+      .on_click((_e, cx) => { cx.stop_propagation(); run(b.command); });
+    el = b.danger
+      ? el.rounded_tr(11).text_color(col("muted")).hover((s) => s.bg(CLOSE_RED).text_color("#ffffff"))
+      : el.text_color(col("muted")).hover((s) => s.bg(col("raised")));
+    return el.child(svg(`mods/apollo-tabs/${b.icon}.svg`).size(10));
+  }
+
   popup() {
     const p = this.p;
     const space = (spaces() ?? []).find((s) => s.id === p.space) ?? { id: p.space, machine: null };
@@ -115,7 +128,10 @@ export default class Tabs extends View {
     if (this.p.menu === "plus") return this.popup();
     const sp = activeSpace(spaces());
     const st = panelState({ layout: layout() });
-    return h_flex().id("root").size_full().px(8).gap(4).items_center()
+    const buttons = windowButtons(herdrWindow());
+    let root = h_flex().id("root").size_full().pl(8).gap(4).items_center();
+    if (!buttons.length) root = root.pr(8);
+    root = root
       .on_size_change((sz) => { this.rootW = sz.width; })
       .child(h_flex().id("tabs").flex_1().min_w(0).gap(4).items_center().overflow_hidden()
         .on_scroll_wheel((e) => {
@@ -131,5 +147,8 @@ export default class Tabs extends View {
       .child(h_flex().id("panels").flex_none().pl(12).gap(4).items_center()
         .on_size_change((sz) => { this.panelsW = sz.width; })
         .children(PANELS.map(([child, label]) => this.panelButton(child, label, st))));
+    if (buttons.length) root = root.child(h_flex().id("window-buttons").h_full().flex_none().pl(4)
+      .children(buttons.map((b) => this.windowButton(b))));
+    return root;
   }
 }

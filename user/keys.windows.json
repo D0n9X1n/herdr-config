@@ -1,0 +1,117 @@
+{
+  "global": {
+    "alt-+": "app.zoom_in",
+    "alt-,": "app.settings",
+    "alt--": "app.zoom_out",
+    "alt-/": "app.help",
+    "alt-?": "app.help",
+    "alt-0": "app.zoom_reset",
+    "alt-1": "tab.select:1",
+    "alt-2": "tab.select:2",
+    "alt-3": "tab.select:3",
+    "alt-4": "tab.select:4",
+    "alt-5": "tab.select:5",
+    "alt-6": "tab.select:6",
+    "alt-7": "tab.select:7",
+    "alt-8": "tab.select:8",
+    "alt-9": "apollo-tabs.last",
+    "alt-=": "app.zoom_in",
+    "alt-]": "agent.next",
+    "ctrl-shift-pageup": "space.prev",
+    "ctrl-shift-pagedown": "space.next",
+    "ctrl-shift-l": "layout.switch",
+    "alt-shift-down": "pane.swap:down",
+    "alt-shift-left": "pane.swap:left",
+    "alt-shift-right": "pane.swap:right",
+    "alt-shift-up": "pane.swap:up",
+    "alt-b": "layout.toggle:sidebar",
+    "alt-d": "pane.split:right",
+    "alt-down": {
+      "args": {
+        "lines": 1
+      },
+      "command": "terminal.scroll"
+    },
+    "alt-end": {
+      "args": {
+        "to": "bottom"
+      },
+      "command": "terminal.scroll"
+    },
+    "alt-home": {
+      "args": {
+        "to": "top"
+      },
+      "command": "terminal.scroll"
+    },
+    "alt-left": "tab.prev",
+    "alt-n": "space.new",
+    "alt-p": "mod.open:picker",
+    "alt-pagedown": {
+      "args": {
+        "pages": 1
+      },
+      "command": "terminal.scroll"
+    },
+    "alt-pageup": {
+      "args": {
+        "pages": -1
+      },
+      "command": "terminal.scroll"
+    },
+    "alt-right": "tab.next",
+    "alt-shift-/": "app.help",
+    "alt-shift-?": "app.help",
+    "alt-shift-=": "app.zoom_in",
+    "alt-shift-[": "tab.prev",
+    "alt-{": "tab.prev",
+    "alt-shift-]": "tab.next",
+    "alt-}": "tab.next",
+    "alt-shift-d": "pane.split:down",
+    "alt-shift-enter": "pane.zoom",
+    "alt-shift-h": "pane.go:left",
+    "alt-shift-j": "pane.go:down",
+    "alt-shift-k": "pane.go:up",
+    "alt-shift-l": "pane.go:right",
+    "alt-shift-p": "app.palette",
+    "alt-shift-t": "tab.new",
+    "alt-shift-w": "pane.close",
+    "alt-shift-z": "pane.zoom",
+    "alt-t": "tab.new",
+    "alt-up": {
+      "args": {
+        "lines": -1
+      },
+      "command": "terminal.scroll"
+    },
+    "alt-w": "pane.close",
+    "ctrl-1": "space.select:1",
+    "ctrl-2": "space.select:2",
+    "ctrl-3": "space.select:3",
+    "ctrl-4": "space.select:4",
+    "ctrl-5": "space.select:5",
+    "ctrl-6": "space.select:6",
+    "ctrl-7": "space.select:7",
+    "ctrl-8": "space.select:8",
+    "ctrl-9": "space.select:9",
+    "ctrl-shift-tab": "tab.prev",
+    "ctrl-tab": "tab.next",
+    "f2": "tab.rename",
+    "shift-f2": "space.rename"
+  },
+  "terminal": {
+    "ctrl-backspace": "send:\u0017",
+    "ctrl-left": "send:\u001bb",
+    "ctrl-right": "send:\u001bf",
+    "alt-c": "terminal.copy",
+    "ctrl-shift-c": "terminal.copy",
+    "ctrl-insert": "terminal.copy",
+    "alt-f": "terminal.search",
+    "ctrl-shift-f": "terminal.search",
+    "alt-left": "tab.prev",
+    "alt-right": "tab.next",
+    "ctrl-shift-v": "terminal.paste",
+    "shift-insert": "terminal.paste",
+    "ctrl-v": "terminal.paste_image"
+  }
+}

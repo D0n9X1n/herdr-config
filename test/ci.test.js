@@ -32,6 +32,7 @@ test("CI runs the offline gates", () => {
     "scripts/in-clone.sh bash test/safe-rm.test.sh",
     "scripts/in-clone.sh bash test/live.test.sh",
     "scripts/in-clone.sh bash test/in-clone.test.sh",
+    "scripts/in-clone.sh bash test/set-app-icon.test.sh",
     "shellcheck -x -P SCRIPTDIR -S warning",
   ]) assert.ok(y.includes(s), s);
   assert.doesNotMatch(y, /smoke\.sh (all|theme-keys|mods|sidebar)/, "no live smoke in CI");

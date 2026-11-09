@@ -115,7 +115,7 @@ user/settings.json user/keys.json user/keys.overrides.json agent/herdr-context.s
 scripts/smoke.sh scripts/shots.sh
 assets/screenshots/preview.png README.md RECIPE.md LICENSE CLAUDE.md wiki/Home.md wiki/Home-zh-CN.md wiki/_Sidebar.md
 scripts/in-clone.sh .github/workflows/ci.yml
-assets/logo/apollo.svg assets/logo/apollo.icns mods/apollo-chrome/logo.png scripts/gen-logo.sh"
+assets/logo/apollo.svg assets/logo/apollo.icns mods/apollo-chrome/logo.png scripts/gen-logo.sh scripts/set-app-icon.sh"
 check_files() {
   local f tracked
   for f in $REQUIRED_FILES; do [ -f "$f" ] || fail "missing $f"; done

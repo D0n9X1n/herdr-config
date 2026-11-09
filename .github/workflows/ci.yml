@@ -30,10 +30,11 @@ jobs:
         run: npm test
       - name: Repo checks that don't need Herdr
         run: scripts/check.sh theme settings user keys ctx refresh shared gallery cleanroom gitignore files shots docs wiki privacy logo
-      - name: safe-rm, live (fake home) and in-clone tests, in a temp clone
+      - name: safe-rm, live (fake home), in-clone and app-icon (macOS only; skips here) tests, in a temp clone
         run: |
           scripts/in-clone.sh bash test/safe-rm.test.sh
           scripts/in-clone.sh bash test/live.test.sh
           scripts/in-clone.sh bash test/in-clone.test.sh
+          scripts/in-clone.sh bash test/set-app-icon.test.sh
       - name: shellcheck
         run: git ls-files -z '*.sh' | xargs -0 shellcheck -x -P SCRIPTDIR -S warning

@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-SECTIONS=(json test theme settings user keys ctx refresh shared gallery cleanroom gitignore files shots docs wiki privacy)
+SECTIONS=(json test theme settings user keys ctx refresh shared gallery cleanroom gitignore files shots docs wiki privacy logo)
 
 fail() { echo "FAIL $SECTION: $*" >&2; exit 1; }
 
@@ -114,7 +114,8 @@ mods/apollo-changes/main.js mods/apollo-specs/main.js mods/apollo-status/main.js
 user/settings.json user/keys.json user/keys.overrides.json agent/herdr-context.sh scripts/check.sh .gitignore
 scripts/smoke.sh scripts/shots.sh
 assets/screenshots/preview.png README.md RECIPE.md LICENSE CLAUDE.md wiki/Home.md wiki/Home-zh-CN.md wiki/_Sidebar.md
-scripts/in-clone.sh .github/workflows/ci.yml"
+scripts/in-clone.sh .github/workflows/ci.yml
+assets/logo/apollo.svg assets/logo/apollo.icns mods/apollo-chrome/logo.png scripts/gen-logo.sh"
 check_files() {
   local f tracked
   for f in $REQUIRED_FILES; do [ -f "$f" ] || fail "missing $f"; done
@@ -126,8 +127,8 @@ check_files() {
 # every capture in a temp folder at capture time; nothing else from a capture is tracked.
 check_shots() {
   local got
-  got=$(git ls-files -- 'assets/*' | tr '\n' ' ')
-  [ "$got" = "assets/screenshots/preview.png " ] || fail "assets/ must track only assets/screenshots/preview.png, has [$got]"
+  got=$(git ls-files -- 'assets/screenshots/*' | tr '\n' ' ')
+  [ "$got" = "assets/screenshots/preview.png " ] || fail "assets/screenshots/ must track only preview.png, has [$got]"
   [ -s assets/screenshots/preview.png ] || fail "assets/screenshots/preview.png is missing or empty"
   [ -z "$(git ls-files -- '*.BLOCKED')" ] || fail "a capture is BLOCKED"
 }
@@ -150,6 +151,11 @@ check_privacy() {
   [ -n "$self" ] || fail "scripts/check.sh has no PRIVACY_PATTERN line"
   hits=$(git grep -n -I -E "$PRIVACY_PATTERN" -- . | awk -F: -v n="$self" '!($1 == "scripts/check.sh" && $2 == n)' || true)
   [ -z "$hits" ] || fail "owner path or real id in: $(printf '%s' "$hits" | cut -d: -f1,2 | head -5 | tr '\n' ' ')"
+}
+
+# The logo: the SVG is pinned; logo.png and apollo.icns match a fresh rsvg-convert render of it.
+check_logo() {
+  node --test test/logo.test.js >/dev/null 2>&1 || fail "the logo assets drifted from assets/logo/apollo.svg (run scripts/gen-logo.sh)"
 }
 
 run_section() {

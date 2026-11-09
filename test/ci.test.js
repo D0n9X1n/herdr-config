@@ -27,7 +27,8 @@ test("CI runs the offline gates", () => {
   for (const s of [
     "scripts/check.sh json",
     "npm test",
-    "scripts/check.sh theme settings user keys ctx refresh shared gallery cleanroom gitignore files shots docs wiki privacy",
+    "scripts/check.sh theme settings user keys ctx refresh shared gallery cleanroom gitignore files shots docs wiki privacy logo",
+    "librsvg2-bin",
     "scripts/in-clone.sh bash test/safe-rm.test.sh",
     "scripts/in-clone.sh bash test/live.test.sh",
     "scripts/in-clone.sh bash test/in-clone.test.sh",

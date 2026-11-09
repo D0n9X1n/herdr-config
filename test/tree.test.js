@@ -15,7 +15,7 @@ test("no tracked file is under docs/, and git ignores docs/", () => {
 
 test("the only tracked screenshot is assets/screenshots/preview.png", () => {
   const t = tracked();
-  assert.deepEqual(t.filter((f) => f.startsWith("assets/")), ["assets/screenshots/preview.png"]);
+  assert.deepEqual(t.filter((f) => f.startsWith("assets/screenshots/")), ["assets/screenshots/preview.png"]);
   assert.ok(!t.includes("preview.png"), "no root preview.png");
   assert.ok(!t.some((f) => /png-crop/.test(f)), "the sidebar crop script is gone");
 });

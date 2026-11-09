@@ -24,3 +24,17 @@ Herdr 不会通过符号链接的 mod 文件夹加载 `svg()` 图标。mod 的�
 ## 快捷键和设置
 
 `user/keys.json` 是一个完整的快捷键文件：Herdr 0.1.14 的默认值，加上[快捷键](Keys-zh-CN)里的改动。只有你想全部使用时，才用它覆盖你的 `keys.json`。`user/settings.json` 是作者自己的设置，你不需要它。
+
+## 应用图标
+
+`scripts/set-app-icon.sh` 把 Herdr 在程序坞和访达里的图标换成 Apollo 标志（`assets/logo/apollo.icns`）。它只给应用设置访达自定义图标，从不改动 `Contents/` 里的任何东西。它使用 `~/Applications/Herdr.app`，没有时使用 `/Applications/Herdr.app`；用 `--app PATH` 可以指定别的位置。
+
+```sh
+scripts/set-app-icon.sh --restart-dock
+```
+
+`--restart-dock` 会重启程序坞，让新图标立刻显示。`--check` 只有在设置了自定义图标时才以 0 退出。`--remove` 会恢复 Herdr 自己的图标。
+
+Herdr 更新会替换整个应用并重置图标，所以每次更新后要再运行一次。
+
+之后 `codesign --verify --strict` 会报告 "Finder information" 残留。这是正常的：`spctl`（Gatekeeper）仍然接受这个经过公证的应用。

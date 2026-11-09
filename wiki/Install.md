@@ -24,3 +24,17 @@ Herdr doesn't load `svg()` glyphs through a symlinked mod folder. The mod's code
 ## Keys and settings
 
 `user/keys.json` is a full keys file: the Herdr 0.1.14 defaults plus the changes in [Keys](Keys). Copy it over your `keys.json` only if you want all of it. `user/settings.json` is the author's own settings; you don't need it.
+
+## App icon
+
+`scripts/set-app-icon.sh` sets Herdr's Dock and Finder icon to the Apollo logo (`assets/logo/apollo.icns`). It sets a Finder custom icon on the app and never touches anything inside `Contents/`. It uses `~/Applications/Herdr.app`, else `/Applications/Herdr.app`; `--app PATH` picks another.
+
+```sh
+scripts/set-app-icon.sh --restart-dock
+```
+
+`--restart-dock` restarts the Dock so the icon shows now. `--check` exits 0 only if the custom icon is set. `--remove` puts Herdr's own icon back.
+
+A Herdr update replaces the app and resets the icon, so run it again after each update.
+
+`codesign --verify --strict` then reports "Finder information" detritus. That is expected: `spctl` (Gatekeeper) still accepts the notarized app.

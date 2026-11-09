@@ -27,10 +27,12 @@ test("CI runs the offline gates", () => {
   for (const s of [
     "scripts/check.sh json",
     "npm test",
-    "scripts/check.sh theme settings user keys ctx refresh shared gallery cleanroom gitignore files shots docs wiki privacy",
+    "scripts/check.sh theme settings user keys ctx refresh shared gallery cleanroom gitignore files shots docs wiki privacy logo",
+    "librsvg2-bin",
     "scripts/in-clone.sh bash test/safe-rm.test.sh",
     "scripts/in-clone.sh bash test/live.test.sh",
     "scripts/in-clone.sh bash test/in-clone.test.sh",
+    "scripts/in-clone.sh bash test/set-app-icon.test.sh",
     "shellcheck -x -P SCRIPTDIR -S warning",
   ]) assert.ok(y.includes(s), s);
   assert.doesNotMatch(y, /smoke\.sh (all|theme-keys|mods|sidebar)/, "no live smoke in CI");

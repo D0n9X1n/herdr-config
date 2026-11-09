@@ -28,6 +28,7 @@ An original Herdr layout with Apollo colors and a SonicTerm-aligned macOS keymap
 - **Changes and Specs panels**: diffs with staged and unstaged groups, and your repo's specs with a "Work on it" button. See [Panels](wiki/Panels.md).
 - **A SonicTerm keymap** for macOS. See [Keys](wiki/Keys.md).
 - **Agent context**: a hook script tells Claude Code or Copilot CLI that they run in Herdr. See [Agent Context](wiki/Agent-Context.md).
+- **Apollo app icon** for the Dock: `scripts/set-app-icon.sh`. See [Install](wiki/Install.md).
 
 ## Install
 

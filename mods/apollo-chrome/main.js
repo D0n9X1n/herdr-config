@@ -36,10 +36,11 @@ export default class Chrome extends View {
         .child(this.control("panel-open", "panel-open", () => expand({ saved: shared("apollo.sidebar.width") }, handlers)));
     }
     const icon = vm.children.find((n) => n.kind === "app-icon").attrs;
+    const word = vm.children.find((n) => n.kind === "wordmark").attrs;
     return row.pl(icon.x)
       .child(image(icon.src).size(icon.size).rounded(icon.radius).flex_none())
       .child(div().w(8).flex_none())
-      .child(div().text_size(14).font_semibold().text_color(col("foreground")).truncate().child("Herdr"))
+      .child(div().text_size(word.size).font_semibold().text_color(col(word.color)).truncate().child(word.text))
       .child(div().flex_1())
       .child(this.control("search", "search", () => setShared("apollo.sidebar.search", !shared("apollo.sidebar.search"))))
       .child(div().w(4).flex_none())

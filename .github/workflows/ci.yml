@@ -20,7 +20,7 @@ jobs:
       - name: Tools
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y -q zsh shellcheck jq
+          sudo apt-get install -y -q zsh shellcheck jq librsvg2-bin
       # Tests keep fixtures under /private/tmp/apollo-test.* (the macOS path); Linux has no /private.
       - name: Temp base
         run: sudo mkdir -p /private/tmp && sudo chmod 1777 /private/tmp
@@ -29,11 +29,12 @@ jobs:
       - name: npm test
         run: npm test
       - name: Repo checks that don't need Herdr
-        run: scripts/check.sh theme settings user keys ctx refresh shared gallery cleanroom gitignore files shots docs wiki privacy
-      - name: safe-rm, live (fake home) and in-clone tests, in a temp clone
+        run: scripts/check.sh theme settings user keys ctx refresh shared gallery cleanroom gitignore files shots docs wiki privacy logo
+      - name: safe-rm, live (fake home), in-clone and app-icon (macOS only; skips here) tests, in a temp clone
         run: |
           scripts/in-clone.sh bash test/safe-rm.test.sh
           scripts/in-clone.sh bash test/live.test.sh
           scripts/in-clone.sh bash test/in-clone.test.sh
+          scripts/in-clone.sh bash test/set-app-icon.test.sh
       - name: shellcheck
         run: git ls-files -z '*.sh' | xargs -0 shellcheck -x -P SCRIPTDIR -S warning

@@ -5,9 +5,28 @@
 # selected; every change is temporary (L1 rollback, which also restores the space order). Captures go to
 # OUT, a fresh /private/tmp/apollo-test.* dir printed as `OUT=…`, never into the repo: the person reviews
 # each PNG (privacy gate) before the Changes shot is copied to assets/screenshots/preview.png. No zoom/settings/key changes.
-#   bash scripts/shots.sh
+# The person's own sidebar rows are painted out of the preview (scripts/png-mask-rows.mjs): OUT/preview.png
+# is the Changes shot with the sidebar from below the last fixture row to the footer filled with chrome.
+#   bash scripts/shots.sh                capture into a fresh OUT
+#   bash scripts/shots.sh --accept OUT   after the privacy gate passed on OUT/preview.png: copy it to
+#                                        assets/screenshots/preview.png and record its sha256 (offline)
 set -euo pipefail
 REPO=$(cd "$(dirname "$0")/.." && pwd -P)
+
+if [ "${1:-}" = --accept ]; then
+  src=${2:-}
+  [ -n "$src" ] && [ -s "$src/preview.png" ] || { echo "shots --accept: no $src/preview.png" >&2; exit 1; }
+  [ -s "$src/preview.measure.json" ] || { echo "shots --accept: no $src/preview.measure.json" >&2; exit 1; }
+  jq -e '.sidebarPx >= 255 and .sidebarPx <= 257 and .activeRowBg == "#fabd2f" and .trafficViolations == 0' \
+    "$src/preview.measure.json" >/dev/null || { echo "shots --accept: preview measure failed: $(cat "$src/preview.measure.json")" >&2; exit 1; }
+  dst="$REPO/assets/screenshots"
+  [ -d "$dst" ] || { echo "shots --accept: no $dst" >&2; exit 1; }
+  cp "$src/preview.png" "$dst/preview.png"
+  sum=$(if command -v shasum >/dev/null 2>&1; then shasum -a 256; else sha256sum; fi < "$dst/preview.png" | cut -c1-64)
+  printf '%s  preview.png\n' "$sum" > "$dst/preview.sha256"
+  echo "accepted: assets/screenshots/preview.png ($sum)"
+  exit 0
+fi
 # shellcheck source=smoke.sh
 SMOKE_LIB=1 . "$REPO/scripts/smoke.sh"
 
@@ -111,5 +130,16 @@ jq -e '.sidebarPx >= 183 and .sidebarPx <= 185 and .activeRowBg == "#fabd2f" and
 jq -e '.activeRowBg == "#fabd2f" and .trafficViolations == 0' "$OUT/expanded.measure.json" >/dev/null \
   || fail "expanded measure: $(cat "$OUT/expanded.measure.json")"
 
+# The preview: the Changes shot with the person's own rows painted chrome. Sidebar geometry (design px):
+# brand 48, New space 32 + 12 gap, then the two fixture rows (44 each, 2 apart) end at 48+32+12+44+2+44 = 182.
+# The band runs from there to the footer's top (window height - 130), across the sidebar's width.
+footer_top=$(jq '.bounds[3] - 130' "$HERDR_HOME/window.json")
+node "$REPO/scripts/png-mask-rows.mjs" "$OUT/changes.png" "$OUT/preview.png" --window-width "$ww" --zoom "$z" \
+  --x0 0 --x1 "$start" --y0 182 --y1 "$footer_top" || fail "mask preview"
+printf '%s\n' "$(node "$REPO/scripts/measure.js" "$OUT/preview.png" --window-width "$ww" --zoom "$z" --mask "$OUT/mask.png")" > "$OUT/preview.measure.json"
+echo "measure preview: $(cat "$OUT/preview.measure.json")"
+jq -e '.sidebarPx >= 255 and .sidebarPx <= 257 and .activeRowBg == "#fabd2f" and .trafficViolations == 0' "$OUT/preview.measure.json" >/dev/null \
+  || fail "preview measure: $(cat "$OUT/preview.measure.json")"
+
 apollo_down
-echo "shots: ok (review $OUT before committing anything)"
+echo "shots: ok (review $OUT/preview.png; if the privacy gate passes: bash scripts/shots.sh --accept $OUT)"

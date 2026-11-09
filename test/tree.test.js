@@ -13,9 +13,9 @@ test("no tracked file is under docs/, and git ignores docs/", () => {
   assert.equal(git("check-ignore", "-q", "docs/specs/any.md").status, 0, "docs/ is ignored");
 });
 
-test("the only tracked screenshot is assets/screenshots/preview.png", () => {
+test("assets/screenshots/ tracks only the preview and its privacy-gate record", () => {
   const t = tracked();
-  assert.deepEqual(t.filter((f) => f.startsWith("assets/")), ["assets/screenshots/preview.png"]);
+  assert.deepEqual(t.filter((f) => f.startsWith("assets/screenshots/")), ["assets/screenshots/preview.png", "assets/screenshots/preview.sha256"]);
   assert.ok(!t.includes("preview.png"), "no root preview.png");
   assert.ok(!t.some((f) => /png-crop/.test(f)), "the sidebar crop script is gone");
 });

@@ -75,6 +75,15 @@ test("Install: copies, not links, and why", () => {
   assert.match(section(md, "Copies, not links"), /`svg\(\)`/);
 });
 
+test("Install: an App icon section: the script, --remove, rerun after a Herdr update, the codesign note", () => {
+  const md = read("Install"), icon = section(md, "App icon");
+  for (const c of ["scripts/set-app-icon.sh", "--remove", "--check", "--restart-dock", "Contents/", "codesign --verify --strict", "spctl"]) {
+    assert.ok(icon.includes(`\`${c}\``), c);
+  }
+  assert.match(icon, /update/);
+  assert.match(icon, /again/);
+});
+
 test("Keys: every override, cmd-9, the bindable commands and the unbound SonicTerm actions", () => {
   const md = read("Keys");
   const over = JSON.parse(readFileSync(join(root, "user/keys.overrides.json"), "utf8"));

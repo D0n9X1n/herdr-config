@@ -39,13 +39,14 @@ export function account(home) {
 
 const node = (kind, attrs = {}, children = []) => ({ kind, attrs, children });
 
-// Brand row (48 px, window_drag). Expanded: app icon, wordmark, search, panel-close. Collapsed: panel-open only.
+// Brand row (48 px, window_drag). Expanded: the Apollo logo (assets/logo/apollo.svg at 64 px), the wordmark,
+// search, panel-close. Collapsed: panel-open only.
 export function brandView({ collapsed, platform = "macos", fullscreen = false }) {
   if (collapsed) return node("brand", { height: 48, collapsed: true }, [node("panel-open", { id: "panel-open", size: 28 })]);
   const x = platform === "macos" && !fullscreen ? 84 : 12;
   return node("brand", { height: 48, collapsed: false }, [
-    node("app-icon", { src: "frame/welcome/herdr.png", x, size: 20, radius: 5 }),
-    node("wordmark", { text: "Herdr", size: 14, color: "foreground" }),
+    node("app-icon", { src: "mods/apollo-chrome/logo.png", x, size: 20, radius: 5 }),
+    node("wordmark", { text: "Apollo", size: 14, color: "foreground" }),
     node("search", { id: "search", size: 28 }),
     node("panel-close", { id: "panel-close", size: 28 }),
   ]);

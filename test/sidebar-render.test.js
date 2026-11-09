@@ -23,10 +23,10 @@ test("expanded: one plus; app icon at x 84 on macOS (20 px, radius 5); wordmark,
   assert.equal(count(s, "plus"), 1);
   const icon = findAll(s, (n) => n.kind === "app-icon");
   assert.equal(icon.length, 1);
-  assert.deepEqual(icon[0].attrs, { src: "frame/welcome/herdr.png", x: 84, size: 20, radius: 5 });
+  assert.deepEqual(icon[0].attrs, { src: "mods/apollo-chrome/logo.png", x: 84, size: 20, radius: 5 });
   for (const k of ["wordmark", "search", "panel-close"]) assert.equal(count(s, k), 1, k);
   assert.equal(count(s, "panel-open"), 0);
-  assert.equal(findAll(s, (n) => n.kind === "wordmark")[0].attrs.text, "Herdr");
+  assert.equal(findAll(s, (n) => n.kind === "wordmark")[0].attrs.text, "Apollo");
   for (const sp of findAll(s, (n) => n.kind === "space")) {
     assert.equal(count(sp, "name"), 1);
     assert.equal(count(sp, "branch"), 1);

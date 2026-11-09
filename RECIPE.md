@@ -9,7 +9,7 @@ A dark Herdr layout in the Apollo colors. On the left, a sidebar lists your spac
 Left to right:
 
 - **Sidebar**, 256 px wide (184–480), on `chrome` `#141617`:
-  - **Brand row**, 48 px, draggable. The native traffic lights at `[12, 16]`; nothing is drawn in x 12–70, y 10–30. Then the Herdr app icon (20 px, radius 5) and "Herdr" in 14 px semibold `foreground` `#cfbc97`. On the right, `search` and `panel-close`, 28×28 each.
+  - **Brand row**, 48 px, draggable. The native traffic lights at `[12, 16]`; nothing is drawn in x 12–70, y 10–30. Then the Apollo logo (`mods/apollo-chrome/logo.png`, 20 px, radius 5) and "Apollo" in 14 px semibold `foreground` `#cfbc97`. On the right, `search` and `panel-close`, 28×28 each.
   - **Spaces block**, 8 px side padding. A full-width "New space" button (32 px, radius 8, `raised` `#1c1f20`, 1 px `border` `#3c3836`). Then one 44 px row per space: a fold chevron (only when the space has agents), a 20×20 two-letter tile in `ansi4`, `ansi5` or `ansi6`, the name (13 px semibold) over a 12 px `branch` glyph and branch name (12 px `dim` `#928374`), and a 12 px status mark on the right. Under an unfolded space, 28 px agent rows: program icon (14), title (12 px `muted` `#d5c4a1`), status mark, with a 1 px guide line at x 20. The active space has an `accent` `#fabd2f` fill, and its text and marks turn `solid_foreground` `#141617`. Machine headers appear only with two or more machines.
   - **Footer**, 130 px: a 1 px top line, Settings and Add machine rows (32 px, 16 px icon, 13 px label), then the account row: a 28 px avatar circle with an initial, the user's name, and "N agents" in 11.5 px `dim`.
 - **Main column**, 6 px padding and gap:

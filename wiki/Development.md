@@ -12,11 +12,14 @@ scripts/check.sh all
 scripts/in-clone.sh bash test/safe-rm.test.sh
 scripts/in-clone.sh bash test/live.test.sh
 scripts/in-clone.sh bash test/in-clone.test.sh
+scripts/in-clone.sh bash test/set-app-icon.test.sh
 scripts/in-clone.sh bash test/smoke.test.sh
 scripts/in-clone.sh bash -c 'for m in mods/apollo-*; do herdr-app check "$m"; done'
 ```
 
 `scripts/check.sh all` checks JSON, the theme and keys tables, the agent script, the clean room, privacy (no owner paths or real ids), the wiki pairs and the docs. Tests that make or delete files run only inside a disposable clone (`scripts/in-clone.sh`).
+
+`scripts/gen-logo.sh` regenerates `mods/apollo-chrome/logo.png` and `assets/logo/apollo.icns` from `assets/logo/apollo.svg`; `scripts/check.sh logo` checks that they match it.
 
 ## Live safety
 

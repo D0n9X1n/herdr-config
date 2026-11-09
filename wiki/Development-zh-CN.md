@@ -12,11 +12,14 @@ scripts/check.sh all
 scripts/in-clone.sh bash test/safe-rm.test.sh
 scripts/in-clone.sh bash test/live.test.sh
 scripts/in-clone.sh bash test/in-clone.test.sh
+scripts/in-clone.sh bash test/set-app-icon.test.sh
 scripts/in-clone.sh bash test/smoke.test.sh
 scripts/in-clone.sh bash -c 'for m in mods/apollo-*; do herdr-app check "$m"; done'
 ```
 
 `scripts/check.sh all` 会检查 JSON、主题和快捷键表、agent 脚本、净室规则、隐私（没有作者的路径或真实 id）、wiki 双语页面和文档。会创建或删除文件的测试只在一次性克隆中运行（`scripts/in-clone.sh`）。
+
+`scripts/gen-logo.sh` 根据 `assets/logo/apollo.svg` 重新生成 `mods/apollo-chrome/logo.png` 和 `assets/logo/apollo.icns`；`scripts/check.sh logo` 检查它们是否一致。
 
 ## 实机安全
 

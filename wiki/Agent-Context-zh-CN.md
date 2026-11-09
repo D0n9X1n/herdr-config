@@ -24,4 +24,4 @@
 
 - 没有设置 `HC_TERMINAL_ID`（不在 Herdr 里）。
 - 缺少 `herdr-app` 或 `hc`。
-- 对 Claude 来说，`CLAUDE_CODE_ENTRYPOINT` 被设成了 `cli` 以外的值。
+- 对 Claude 来说，`CLAUDE_CODE_ENTRYPOINT` 被设成了 `cli` 和 `sdk-cli` 以外的值。`sdk-cli` 是在终端里运行的 `claude -p`；桌面应用（`claude-desktop`）保持安静。

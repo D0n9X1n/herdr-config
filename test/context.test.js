@@ -59,6 +59,7 @@ for (const shell of SHELLS) {
       ["herdr-app missing", run("claude", {}, { shell, path: bins.noHerdr })],
       ["hc missing", run("copilot", {}, { shell, path: bins.noHc })],
       ["claude-desktop", run("claude", { CLAUDE_CODE_ENTRYPOINT: "claude-desktop" }, { shell })],
+      ["claude sdk-ts", run("claude", { CLAUDE_CODE_ENTRYPOINT: "sdk-ts" }, { shell })],
       ["unknown cli", run("other", {}, { shell })],
     ];
     for (const [name, r] of cases) {
@@ -67,8 +68,8 @@ for (const shell of SHELLS) {
     }
   });
 
-  test(`${shell}: claude shape (entrypoint unset and cli)`, () => {
-    for (const env of [{}, { CLAUDE_CODE_ENTRYPOINT: "cli" }]) {
+  test(`${shell}: claude shape (entrypoint unset, cli and sdk-cli)`, () => {
+    for (const env of [{}, { CLAUDE_CODE_ENTRYPOINT: "cli" }, { CLAUDE_CODE_ENTRYPOINT: "sdk-cli" }]) {
       const r = run("claude", env, { shell });
       assert.equal(r.code, 0, r.err);
       const j = JSON.parse(r.out);

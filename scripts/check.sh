@@ -113,7 +113,7 @@ mods/apollo-chrome/main.js mods/apollo-spaces/main.js mods/apollo-tabs/main.js m
 mods/apollo-changes/main.js mods/apollo-specs/main.js mods/apollo-status/main.js
 user/settings.json user/keys.json user/keys.overrides.json agent/herdr-context.sh scripts/check.sh .gitignore
 scripts/smoke.sh scripts/shots.sh
-assets/screenshots/preview.png README.md RECIPE.md LICENSE CLAUDE.md wiki/Home.md wiki/Home-zh-CN.md wiki/_Sidebar.md
+assets/screenshots/preview.png assets/screenshots/preview.sha256 README.md RECIPE.md LICENSE CLAUDE.md wiki/Home.md wiki/Home-zh-CN.md wiki/_Sidebar.md
 scripts/in-clone.sh .github/workflows/ci.yml
 assets/logo/apollo.svg assets/logo/apollo.icns mods/apollo-chrome/logo.png scripts/gen-logo.sh scripts/set-app-icon.sh"
 check_files() {
@@ -123,14 +123,18 @@ check_files() {
   [ -z "$tracked" ] || fail "generated files are tracked: $(printf '%s' "$tracked" | tr '\n' ' ')"
 }
 
-# The repo tracks one capture: the preview (the Changes shot). scripts/shots.sh measures and privacy-checks
-# every capture in a temp folder at capture time; nothing else from a capture is tracked.
+# The repo tracks one capture: the preview (the Changes shot, with the person's own sidebar rows painted
+# out), plus preview.sha256, which scripts/shots.sh --accept writes after a person passed the privacy gate
+# on those exact bytes. A preview that changed since the gate fails here.
 check_shots() {
-  local got
+  local got want
   got=$(git ls-files -- 'assets/screenshots/*' | tr '\n' ' ')
-  [ "$got" = "assets/screenshots/preview.png " ] || fail "assets/screenshots/ must track only preview.png, has [$got]"
+  [ "$got" = "assets/screenshots/preview.png assets/screenshots/preview.sha256 " ] \
+    || fail "assets/screenshots/ must track only preview.png and preview.sha256, has [$got]"
   [ -s assets/screenshots/preview.png ] || fail "assets/screenshots/preview.png is missing or empty"
-  [ -z "$(git ls-files -- '*.BLOCKED')" ] || fail "a capture is BLOCKED"
+  want="$(_sha < assets/screenshots/preview.png)  preview.png"
+  [ "$(cat assets/screenshots/preview.sha256)" = "$want" ] \
+    || fail "assets/screenshots/preview.png changed since its privacy gate (rerun scripts/shots.sh, review, then --accept)"
 }
 
 # README, RECIPE, LICENSE and CLAUDE.md match the repo; no tracked file names another layout; docs/ is not tracked.

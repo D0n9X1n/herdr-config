@@ -57,3 +57,14 @@ test("no tracked text file names another layout", () => {
   }
   assert.deepEqual(bad, []);
 });
+
+// The README image can't be scanned for words, so a person's privacy-gate pass is recorded instead:
+// scripts/shots.sh --accept writes preview.sha256 for the exact bytes that passed. A changed image fails.
+test("README's image passed the privacy gate: preview.sha256 matches preview.png", () => {
+  const readme = readFileSync(join(root, "README.md"), "utf8");
+  const imgs = [...readme.matchAll(/<img\b[^>]*\bsrc="([^"]+)"|!\[[^\]]*\]\(([^)\s]+)\)/g)].map((m) => m[1] ?? m[2]).filter((s) => !/^https?:/.test(s));
+  assert.deepEqual(imgs, ["assets/screenshots/preview.png"]);
+  const rec = readFileSync(join(root, "assets/screenshots/preview.sha256"), "utf8");
+  const sha = createHash("sha256").update(readFileSync(join(root, "assets/screenshots/preview.png"))).digest("hex");
+  assert.equal(rec, `${sha}  preview.png\n`);
+});

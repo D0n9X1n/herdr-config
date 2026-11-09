@@ -174,7 +174,7 @@ function stubs(dir, { herdr = true, hc = true, xs = 8600 } = {}) {
     writeFileSync(f, WIN ? `@echo off\r\n${body}\r\n` : `#!/bin/sh\n${body}\n`);
     if (!WIN) chmodSync(f, 0o755);
   };
-  if (herdr) stub("herdr-app", WIN ? `if "%1"=="--skill" type "${payload}"` : `[ "$1" = --skill ] && exec cat '${payload}'\nexit 0`);
+  if (herdr) stub("herdr-app", WIN ? `if "%1"=="--skill" type "${payload}"` : `[ "$1" = --skill ] && exec /bin/cat '${payload}'\nexit 0`);
   if (hc) stub("hc", WIN ? "exit /b 0" : "exit 0");
   return dir;
 }

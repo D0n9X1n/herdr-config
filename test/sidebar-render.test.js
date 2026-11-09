@@ -18,15 +18,16 @@ function sidebar(collapsed, { platform = "macos", fullscreen = false } = {}) {
 const kinds = (n) => findAll(n, () => true).map((x) => x.kind);
 const texts = (n) => findAll(n, (x) => typeof x.attrs?.text === "string").map((x) => x.attrs.text);
 
-test("expanded: one plus; app icon at x 84 on macOS (20 px, radius 5); wordmark, search, panel-close", () => {
+test("expanded: one plus; app icon at x 84 on macOS (20 px, radius 5); no wordmark; search, panel-close", () => {
   const s = sidebar(false);
   assert.equal(count(s, "plus"), 1);
   const icon = findAll(s, (n) => n.kind === "app-icon");
   assert.equal(icon.length, 1);
   assert.deepEqual(icon[0].attrs, { src: "mods/apollo-chrome/logo.png", x: 84, size: 20, radius: 5 });
-  for (const k of ["wordmark", "search", "panel-close"]) assert.equal(count(s, k), 1, k);
+  for (const k of ["search", "panel-close"]) assert.equal(count(s, k), 1, k);
   assert.equal(count(s, "panel-open"), 0);
-  assert.equal(findAll(s, (n) => n.kind === "wordmark")[0].attrs.text, "Apollo");
+  assert.equal(count(s, "wordmark"), 0);
+  assert.ok(!texts(s).includes("Apollo"));
   for (const sp of findAll(s, (n) => n.kind === "space")) {
     assert.equal(count(sp, "name"), 1);
     assert.equal(count(sp, "branch"), 1);
@@ -41,13 +42,14 @@ test("app icon x is 12 in fullscreen and off macOS", () => {
   assert.equal(x({ platform: "linux" }), 12);
 });
 
-test("collapsed: one plus; every space named; brand holds only panel-open; no icon, wordmark, search or N agents", () => {
+test("collapsed: one plus; every space named; brand holds the app icon and panel-open; no wordmark, search or N agents", () => {
   const s = sidebar(true);
   assert.equal(count(s, "plus"), 1);
   for (const sp of findAll(s, (n) => n.kind === "space")) assert.equal(count(sp, "name"), 1);
   const brand = s.children[0];
-  assert.deepEqual(kinds(brand), ["brand", "panel-open"]);
-  for (const k of ["app-icon", "wordmark", "search", "panel-close", "agent-count", "branch", "agent"]) assert.equal(count(s, k), 0, k);
+  assert.deepEqual(kinds(brand), ["brand", "app-icon", "panel-open"]);
+  assert.deepEqual(findAll(brand, (n) => n.kind === "app-icon")[0].attrs, { src: "mods/apollo-chrome/logo.png", x: 84, size: 20, radius: 5 });
+  for (const k of ["wordmark", "search", "panel-close", "agent-count", "branch", "agent"]) assert.equal(count(s, k), 0, k);
   assert.ok(!texts(s).some((t) => /agents$/.test(t)));
   assert.ok(texts(s).includes("ann"));
 });

@@ -14,7 +14,7 @@ A space with agents has a chevron: `⌄` when open, `›` when folded. Click it 
 
 ## Collapse
 
-The sidebar is 256 px wide at first. The collapse button saves the width and shrinks the sidebar to 184 px. Tiles, names, the highlight and the marks stay; branch lines, agent rows, chevrons and search hide. The expand button brings back the saved width, or 256 px. A width under 220 px counts as collapsed. Zoom never changes.
+The sidebar is 256 px wide at first. The collapse button saves the width and shrinks the sidebar to 184 px. Tiles, names, the highlight and the marks stay; branch lines, agent rows, chevrons and search hide. The top row shows only the Apollo icon, with no app name, in both widths. The expand button brings back the saved width, or 256 px. A width under 220 px counts as collapsed. Zoom never changes.
 
 ## Width bounds
 

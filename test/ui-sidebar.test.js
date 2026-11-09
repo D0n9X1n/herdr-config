@@ -204,7 +204,7 @@ test("spaces: every status mark is an svg at an explicit 12 px", async () => {
   for (const x of marks) assert.ok(x.calls.some((c) => c.name === "size" && c.args[0] === 12), x.path);
 });
 
-// ---- The Apollo logo: the brand row shows mods/apollo-chrome/logo.png (20 px, radius 5) and "Apollo" ----
+// ---- The Apollo logo: the brand row shows only mods/apollo-chrome/logo.png (20 px, radius 5), in both states ----
 const images = (m) => {
   const out = [];
   const walk = (n) => { const el = n?.__el; if (!el) return; if (el.kind === "image") out.push(el); el.children.forEach(walk); };
@@ -213,19 +213,24 @@ const images = (m) => {
 };
 const texts = (m) => { const out = []; const walk = (n) => { const el = n?.__el; if (!el) { if (typeof n === "string") out.push(n); return; } el.children.forEach(walk); }; walk(m.tree()); return out; };
 
-test("chrome expanded: the brand row shows the Apollo logo at 20 px, radius 5, and the word Apollo", async () => {
+test("chrome expanded: the brand row shows the Apollo logo at 20 px, radius 5, and no app name", async () => {
   const m = await loadMod(CHROME, { data: data(), size: { width: 300, height: 48 } });
   const imgs = images(m);
   assert.equal(imgs.length, 1);
   assert.equal(imgs[0].src, "mods/apollo-chrome/logo.png");
   assert.equal(imgs[0].calls.size, 20);
   assert.equal(imgs[0].calls.rounded, 5);
-  assert.ok(texts(m).includes("Apollo"));
+  assert.ok(!texts(m).includes("Apollo"));
   assert.ok(!texts(m).includes("Herdr"));
 });
 
-test("chrome collapsed: no logo and no wordmark", async () => {
+test("chrome collapsed: the same logo, and no app name", async () => {
   const m = await loadMod(CHROME, { data: data(), size: { width: 184, height: 48 } });
-  assert.deepEqual(images(m), []);
+  const imgs = images(m);
+  assert.equal(imgs.length, 1);
+  assert.equal(imgs[0].src, "mods/apollo-chrome/logo.png");
+  assert.equal(imgs[0].calls.size, 20);
+  assert.equal(imgs[0].calls.rounded, 5);
   assert.ok(!texts(m).includes("Apollo"));
+  assert.ok(!texts(m).includes("Herdr"));
 });

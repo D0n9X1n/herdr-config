@@ -39,14 +39,14 @@ export function account(home) {
 
 const node = (kind, attrs = {}, children = []) => ({ kind, attrs, children });
 
-// Brand row (48 px, window_drag). Expanded: the Apollo logo (assets/logo/apollo.svg at 64 px), the wordmark,
-// search, panel-close. Collapsed: panel-open only.
+// Brand row (48 px, window_drag). Both states show only the Apollo logo (assets/logo/apollo.svg at 64 px),
+// no app name. Expanded adds search and panel-close; collapsed adds panel-open.
 export function brandView({ collapsed, platform = "macos", fullscreen = false }) {
-  if (collapsed) return node("brand", { height: 48, collapsed: true }, [node("panel-open", { id: "panel-open", size: 28 })]);
   const x = platform === "macos" && !fullscreen ? 84 : 12;
+  const icon = node("app-icon", { src: "mods/apollo-chrome/logo.png", x, size: 20, radius: 5 });
+  if (collapsed) return node("brand", { height: 48, collapsed: true }, [icon, node("panel-open", { id: "panel-open", size: 28 })]);
   return node("brand", { height: 48, collapsed: false }, [
-    node("app-icon", { src: "mods/apollo-chrome/logo.png", x, size: 20, radius: 5 }),
-    node("wordmark", { text: "Apollo", size: 14, color: "foreground" }),
+    icon,
     node("search", { id: "search", size: 28 }),
     node("panel-close", { id: "panel-close", size: 28 }),
   ]);

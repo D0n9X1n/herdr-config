@@ -1,0 +1,25 @@
+// apollo-probe (scripts/smoke.sh theme-keys): while open, writes {theme: theme(), keys: keys()} to the
+// output file. smoke.sh renders this template into the claimed mods/apollo-probe/ and deletes it after.
+import { View, div } from "gpui-kit";
+import { theme, keys, readTextFile, writeTextFile } from "herdr";
+
+const OUT = __OUT__;
+
+export default class Probe extends View {
+  init(_props, cx) {
+    this.last = null;
+    const dump = async () => {
+      const text = JSON.stringify({ theme: theme(), keys: keys() });
+      if (text === this.last) return;
+      const prev = await readTextFile(OUT);
+      await writeTextFile(OUT, text, prev);
+      this.last = text;
+    };
+    cx.spawn(async () => { try { await dump(); } catch { /* retried by the timer */ } });
+    cx.timer.every(500, () => { dump().catch(() => {}); });
+  }
+
+  render() {
+    return div().p(8).text_size(12).child("apollo-probe");
+  }
+}

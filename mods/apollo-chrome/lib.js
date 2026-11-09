@@ -1,0 +1,66 @@
+// apollo-chrome: pure logic for the brand block and footer. No herdr or gpui-kit imports.
+// clamp() and the width constants duplicate apollo-spaces on purpose: mods are self-contained.
+
+export const MIN_PX = 184, MAX_PX = 480, DEFAULT_PX = 256, COLLAPSED_PX = 184, COLLAPSE_BELOW = 220;
+export const WIDTH_KEY = "apollo.sidebar.width";
+export const SEARCH_KEY = "apollo.sidebar.search";
+// P1 (wiki/Herdr-Notes.md): unresolved above zoom 1, so one constant (same as apollo-spaces).
+export const SIZE_IS_ZOOMED = false;
+
+export const clamp = (px) => Math.min(MAX_PX, Math.max(MIN_PX, Math.round(px)));
+export const isCollapsed = (width) => width !== undefined && width !== null && width < COLLAPSE_BELOW;
+
+export function designWidth(observed, zoom = 1, zoomed = SIZE_IS_ZOOMED) {
+  if (observed === undefined || observed === null) return undefined;
+  return zoomed ? observed / (zoom || 1) : observed;
+}
+
+// Saves the current design width, then narrows the sidebar to 184. Zoom never changes.
+export function collapse({ observed, zoom = 1, zoomed = SIZE_IS_ZOOMED }, { run, setShared }) {
+  const w = designWidth(observed, zoom, zoomed);
+  setShared("apollo.sidebar.width", w === undefined ? DEFAULT_PX : clamp(w));
+  run("layout.resize", { id: "sidebar", px: COLLAPSED_PX });
+}
+
+// Restores the saved width, or 256 when none is saved or it would still be collapsed.
+export function expand({ saved }, { run }) {
+  const px = typeof saved === "number" && saved >= COLLAPSE_BELOW ? clamp(saved) : DEFAULT_PX;
+  run("layout.resize", { id: "sidebar", px });
+  return px;
+}
+
+export const settings = ({ run }) => run("app.settings");
+export const addMachine = ({ run }) => run("mod.open", { name: "machine-add" });
+
+export function account(home) {
+  const name = String(home ?? "").replace(/\/+$/, "").split("/").pop() ?? "";
+  return { initial: name ? [...name][0].toUpperCase() : "?", name };
+}
+
+const node = (kind, attrs = {}, children = []) => ({ kind, attrs, children });
+
+// Brand row (48 px, window_drag). Expanded: app icon, wordmark, search, panel-close. Collapsed: panel-open only.
+export function brandView({ collapsed, platform = "macos", fullscreen = false }) {
+  if (collapsed) return node("brand", { height: 48, collapsed: true }, [node("panel-open", { id: "panel-open", size: 28 })]);
+  const x = platform === "macos" && !fullscreen ? 84 : 12;
+  return node("brand", { height: 48, collapsed: false }, [
+    node("app-icon", { src: "frame/welcome/herdr.png", x, size: 20, radius: 5 }),
+    node("wordmark", { text: "Herdr", size: 14, color: "foreground" }),
+    node("search", { id: "search", size: 28 }),
+    node("panel-close", { id: "panel-close", size: 28 }),
+  ]);
+}
+
+// Footer: Settings, Add machine, then the account row ("N agents" only when expanded).
+export function footerView({ collapsed, home, agentCount = 0 }) {
+  const acct = account(home);
+  return node("footer", { collapsed }, [
+    node("footer-row", { id: "settings", label: "Settings" }, [node("gear", { color: "dim" })]),
+    node("footer-row", { id: "add-machine", label: "Add machine" }, [node("plug", { color: "dim" })]),
+    node("account", { id: "account" }, [
+      node("avatar", { text: acct.initial }),
+      node("account-name", { text: acct.name, color: "foreground" }),
+      ...(collapsed ? [] : [node("agent-count", { text: `${agentCount} agent${agentCount === 1 ? "" : "s"}`, color: "dim" })]),
+    ]),
+  ]);
+}

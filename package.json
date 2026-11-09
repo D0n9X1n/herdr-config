@@ -1,0 +1,1 @@
+{"private":true,"type":"module","scripts":{"test":"node --import ./test/helpers/register.mjs --test 'test/**/*.test.js'"}}

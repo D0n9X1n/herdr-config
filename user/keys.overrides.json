@@ -1,0 +1,27 @@
+{
+  "global": {
+    "cmd-shift-t": "tab.new",
+    "cmd-w": "pane.close",
+    "cmd-left": "tab.prev",
+    "cmd-right": "tab.next",
+    "cmd-shift-z": "pane.zoom",
+    "cmd-shift-h": "pane.go:left",
+    "cmd-shift-j": "pane.go:down",
+    "cmd-shift-k": "pane.go:up",
+    "cmd-shift-l": "pane.go:right",
+    "cmd-alt-l": "layout.switch",
+    "cmd-up": { "command": "terminal.scroll", "args": { "lines": -1 } },
+    "cmd-down": { "command": "terminal.scroll", "args": { "lines": 1 } },
+    "cmd-pageup": { "command": "terminal.scroll", "args": { "pages": -1 } },
+    "cmd-pagedown": { "command": "terminal.scroll", "args": { "pages": 1 } },
+    "cmd-home": { "command": "terminal.scroll", "args": { "to": "top" } },
+    "cmd-end": { "command": "terminal.scroll", "args": { "to": "bottom" } },
+    "cmd-shift-=": "app.zoom_in",
+    "cmd-[": null,
+    "cmd-9": "apollo-tabs.last"
+  },
+  "terminal": {
+    "cmd-left": "tab.prev",
+    "cmd-right": "tab.next"
+  }
+}

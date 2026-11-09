@@ -1,0 +1,164 @@
+{
+  "id": "root",
+  "type": "row",
+  "background": "canvas",
+  "titlebar": "none",
+  "traffic_lights": [
+    12,
+    16
+  ],
+  "theme": {
+    "light": "paper",
+    "dark": "apollo"
+  },
+  "preview": "layouts/apollo.svg",
+  "children": [
+    {
+      "id": "sidebar",
+      "type": "column",
+      "size": {
+        "px": 256
+      },
+      "min": 184,
+      "max": 480,
+      "background": "chrome",
+      "children": [
+        {
+          "id": "brand",
+          "type": "block",
+          "size": {
+            "px": 48
+          },
+          "window_drag": true,
+          "content": {
+            "mod": "apollo-chrome"
+          }
+        },
+        {
+          "id": "spaces",
+          "type": "block",
+          "size": {
+            "weight": 1
+          },
+          "content": {
+            "mod": "apollo-spaces"
+          }
+        },
+        {
+          "id": "footer",
+          "type": "block",
+          "size": {
+            "px": 130
+          },
+          "content": {
+            "mod": "apollo-chrome",
+            "props": {
+              "footer": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "main",
+      "type": "column",
+      "padding": 6,
+      "gap": 6,
+      "children": [
+        {
+          "id": "card",
+          "type": "column",
+          "size": {
+            "weight": 1
+          },
+          "radius": 12,
+          "border": {
+            "width": 1,
+            "color": "border"
+          },
+          "background": "background",
+          "children": [
+            {
+              "id": "tabs",
+              "type": "block",
+              "size": {
+                "px": 40
+              },
+              "window_drag": true,
+              "content": {
+                "mod": "apollo-tabs"
+              }
+            },
+            {
+              "id": "work",
+              "type": "row",
+              "children": [
+                {
+                  "id": "tab",
+                  "type": "block",
+                  "size": {
+                    "weight": 1
+                  },
+                  "content": {
+                    "tab": "active",
+                    "pane": {
+                      "header": {
+                        "content": {
+                          "mod": "apollo-pane"
+                        },
+                        "height": 34
+                      },
+                      "lone": true
+                    }
+                  }
+                },
+                {
+                  "id": "panel",
+                  "type": "stack",
+                  "size": {
+                    "px": 360
+                  },
+                  "hidden": true,
+                  "active": "changes",
+                  "children": [
+                    {
+                      "id": "files",
+                      "type": "block",
+                      "content": {
+                        "mod": "files"
+                      }
+                    },
+                    {
+                      "id": "changes",
+                      "type": "block",
+                      "content": {
+                        "mod": "apollo-changes"
+                      }
+                    },
+                    {
+                      "id": "specs",
+                      "type": "block",
+                      "content": {
+                        "mod": "apollo-specs"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "status",
+          "type": "block",
+          "size": {
+            "px": 24
+          },
+          "content": {
+            "mod": "apollo-status"
+          }
+        }
+      ]
+    }
+  ]
+}

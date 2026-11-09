@@ -1,0 +1,27 @@
+# Agent 上下文
+
+[English](Agent-Context)
+
+## 它做什么
+
+`agent/herdr-context.sh <claude|copilot>` 告诉 agent 它运行在 Herdr 里。它为会话开始的 hook 输出一个 JSON 对象。内容是一段简短说明，后面接 `herdr-app --skill`，总长最多 9,000 个字符。说明里给出终端的地址（`HC_TERMINAL_ID`）。它提示在改动窗口前运行 `herdr-app --skill`，在启动或协调 agent 前运行 `hc --skill`。
+
+## Claude Code
+
+把它加到 Claude Code 的 `settings.json` 中。内容放在 `hookSpecificOutput.additionalContext` 里。
+
+```json
+{ "hooks": { "SessionStart": [ { "hooks": [ { "type": "command", "command": "/path/to/herdr-config/agent/herdr-context.sh claude" } ] } ] } }
+```
+
+## Copilot CLI
+
+在 Copilot CLI 的会话开始 hook 中运行 `agent/herdr-context.sh copilot`。它输出 `{"additionalContext": …}`。
+
+## 何时不输出
+
+只要下面任一条件成立，它就什么也不输出，并以 0 退出：
+
+- 没有设置 `HC_TERMINAL_ID`（不在 Herdr 里）。
+- 缺少 `herdr-app` 或 `hc`。
+- 对 Claude 来说，`CLAUDE_CODE_ENTRYPOINT` 被设成了 `cli` 以外的值。

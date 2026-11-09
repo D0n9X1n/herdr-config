@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200">
+  <!-- apollo layout preview: original drawing, Apollo theme colors -->
+  <rect width="320" height="200" fill="#141617"/>
+  <circle cx="9" cy="9" r="2.5" fill="#fb4934"/>
+  <circle cx="17" cy="9" r="2.5" fill="#fabd2f"/>
+  <circle cx="25" cy="9" r="2.5" fill="#b8bb26"/>
+  <rect x="8" y="26" width="64" height="9" rx="2.5" fill="#1c1f20" stroke="#3c3836" stroke-width="0.6"/>
+  <rect x="8" y="41" width="64" height="12" rx="2.5" fill="#fabd2f"/>
+  <rect x="11" y="44" width="6" height="6" rx="1.5" fill="#83a598" stroke="#141617" stroke-width="0.6"/>
+  <rect x="20" y="45.5" width="30" height="3" rx="1" fill="#141617"/>
+  <rect x="8" y="57" width="64" height="12" rx="2.5" fill="#141617"/>
+  <rect x="11" y="60" width="6" height="6" rx="1.5" fill="#d3869b"/>
+  <rect x="20" y="61.5" width="26" height="3" rx="1" fill="#cfbc97"/>
+  <rect x="8" y="73" width="64" height="12" rx="2.5" fill="#141617"/>
+  <rect x="11" y="76" width="6" height="6" rx="1.5" fill="#8ec07c"/>
+  <rect x="20" y="77.5" width="22" height="3" rx="1" fill="#cfbc97"/>
+  <line x1="8" y1="170" x2="72" y2="170" stroke="#3c3836" stroke-width="0.6"/>
+  <rect x="8" y="176" width="30" height="3" rx="1" fill="#d5c4a1"/>
+  <rect x="8" y="185" width="36" height="3" rx="1" fill="#d5c4a1"/>
+  <rect x="82" y="4" width="234" height="182" rx="6" fill="#141617" stroke="#3c3836" stroke-width="0.8"/>
+  <rect x="88" y="9" width="34" height="8" rx="4" fill="#3c3836"/>
+  <rect x="126" y="9" width="30" height="8" rx="4" fill="#1d2021"/>
+  <line x1="82" y1="22" x2="316" y2="22" stroke="#3c3836" stroke-width="0.6"/>
+  <rect x="90" y="30" width="80" height="3" rx="1" fill="#928374"/>
+  <rect x="90" y="38" width="120" height="3" rx="1" fill="#cfbc97"/>
+  <rect x="90" y="46" width="96" height="3" rx="1" fill="#b8bb26"/>
+  <rect x="90" y="54" width="110" height="3" rx="1" fill="#cfbc97"/>
+  <rect x="90" y="62" width="70" height="3" rx="1" fill="#fabd2f"/>
+  <rect x="82" y="190" width="234" height="6" rx="2" fill="#141617"/>
+  <rect x="86" y="191.5" width="40" height="3" rx="1" fill="#928374"/>
+  <rect x="270" y="191.5" width="40" height="3" rx="1" fill="#928374"/>
+</svg>

@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "id": "apollo",
+  "name": "Apollo",
+  "description": "A high-contrast Gruvbox Dark Hard theme with SonicTerm's near-black canvas and bright Base16 terminal colors.",
+  "appearance": "dark",
+  "colorSpace": "srgb",
+  "provenance": {
+    "base": "Gruvbox Dark Hard",
+    "variant": "SonicTerm Modified Gruvbox Dark Hard",
+    "sourceRepository": "https://github.com/D0n9X1n/SonicTerm",
+    "sourcePath": "assets/themes/wezterm.toml",
+    "sourceCommit": "81917dc8fe736f18b4a531fd47a0f36fd89eaf8f",
+    "sourceSha256": "0ed79939b82134b14ea3e339ebabee1f22ee5d12bb80915b0a407b5affb5f5ac"
+  },
+  "colors": {
+    "background": "#141617",
+    "surface": "#1d2021",
+    "surfaceHover": "#1c1f20",
+    "selection": "#3c3836",
+    "foreground": "#cfbc97",
+    "foregroundSecondary": "#d5c4a1",
+    "foregroundInactive": "#928374",
+    "foregroundBright": "#fbf1c7",
+    "accent": "#fabd2f",
+    "danger": "#fb4934",
+    "success": "#b8bb26",
+    "info": "#83a598",
+    "magenta": "#d3869b",
+    "cyan": "#8ec07c",
+    "ansiBrightBlack": "#665c54"
+  },
+  "roles": {
+    "canvas": "{colors.background}",
+    "textPrimary": "{colors.foreground}",
+    "textSecondary": "{colors.foregroundSecondary}",
+    "textInactive": "{colors.foregroundInactive}",
+    "focus": "{colors.accent}",
+    "cursor": "{colors.accent}",
+    "cursorText": "{colors.background}",
+    "selection": "{colors.selection}",
+    "error": "{colors.danger}",
+    "warning": "{colors.accent}",
+    "success": "{colors.success}",
+    "information": "{colors.info}"
+  },
+  "terminal": {
+    "foreground": "#cfbc97",
+    "background": "#141617",
+    "cursor": "#fabd2f",
+    "cursorText": "#141617",
+    "selection": {
+      "color": "#3c3836",
+      "alpha": 0.5,
+      "foregroundMode": "preserve"
+    },
+    "ansi": [
+      "#1d2021",
+      "#fb4934",
+      "#b8bb26",
+      "#fabd2f",
+      "#83a598",
+      "#d3869b",
+      "#8ec07c",
+      "#d5c4a1"
+    ],
+    "bright": [
+      "#665c54",
+      "#fb4934",
+      "#b8bb26",
+      "#fabd2f",
+      "#83a598",
+      "#d3869b",
+      "#8ec07c",
+      "#fbf1c7"
+    ]
+  },
+  "constraints": {
+    "minimumTextContrast": 4.5,
+    "minimumLargeTextContrast": 3.0,
+    "restrictedColors": {
+      "#665c54": "ANSI bright black only; never use for normal or small interface text."
+    }
+  }
+}

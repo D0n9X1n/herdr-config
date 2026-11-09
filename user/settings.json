@@ -1,0 +1,12 @@
+{
+  "zoom": 1,
+  "sounds": {
+    "enabled": true
+  },
+  "font": "Rec Mono St.Helens",
+  "font_size": 13,
+  "font_ligatures": false,
+  "ui_font": "Rec Sans Mt.Baker",
+  "minimum_contrast": 1,
+  "appearance": "dark"
+}

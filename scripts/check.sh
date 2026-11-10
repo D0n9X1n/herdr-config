@@ -111,7 +111,7 @@ check_gitignore() {
 REQUIRED_FILES="layouts/apollo.json layouts/apollo.svg themes/apollo.json
 mods/apollo-chrome/main.js mods/apollo-spaces/main.js mods/apollo-tabs/main.js mods/apollo-pane/main.js
 mods/apollo-changes/main.js mods/apollo-specs/main.js mods/apollo-status/main.js
-user/settings.json user/keys.json user/keys.overrides.json agent/herdr-context.sh scripts/check.sh .gitignore
+user/settings.json user/keys.json user/keys.overrides.json user/keys.windows.json agent/herdr-context.sh agent/herdr-context.ps1 scripts/check.sh .gitignore
 scripts/smoke.sh scripts/shots.sh
 assets/screenshots/preview.png assets/screenshots/preview.sha256 README.md RECIPE.md LICENSE CLAUDE.md wiki/Home.md wiki/Home-zh-CN.md wiki/_Sidebar.md
 scripts/in-clone.sh .github/workflows/ci.yml

@@ -29,3 +29,20 @@ Herdr has no command for these, so they have no key: broadcast, pane resize, cop
 
 - `apollo-tabs.last` selects the last tab of the space. `cmd-9` runs it.
 - `apollo-changes.next` selects the next file in the Changes panel and shows its diff. It wraps at the end. Bind it in `keys.json`, for example `"cmd-alt-n": "apollo-changes.next"` in `global`, or run `herdr-app do apollo-changes.next`.
+
+## Windows
+
+On Windows Herdr reads `cmd` as the Windows key, so `user/keys.json` doesn't fit there. `user/keys.windows.json` is the Windows keymap. Like SonicTerm on Windows, it uses Alt where macOS uses Cmd: every `cmd-X` key becomes `alt-X` with the same action, except:
+
+| macOS | Windows | Why |
+|---|---|---|
+| `cmd-alt-[` / `cmd-alt-]` | `ctrl-shift-pageup` / `ctrl-shift-pagedown` | Ctrl+Alt is AltGr on Windows |
+| `cmd-alt-l` | `ctrl-shift-l` | AltGr |
+| `cmd-alt-shift-left` (and the other arrows) | `alt-shift-left` | AltGr |
+| `cmd-alt-left` (and the other arrows) | none | `alt-left` / `alt-right` switch tabs; `alt-shift-h` / `alt-shift-j` / `alt-shift-k` / `alt-shift-l` move between panes |
+| `cmd-v` | `ctrl-shift-v`, `shift-insert` | Windows paste keys |
+| `cmd-backspace` | none | |
+| terminal `alt-backspace`, `alt-left`, `alt-right` | `ctrl-backspace`, `ctrl-left`, `ctrl-right` | Windows word keys |
+| `cmd-h`, `cmd-alt-h`, `cmd-q` | none | macOS only; Alt+F4 closes the window |
+
+It adds a few Windows keys: `alt-{`, `alt-}`, `alt-?` and `alt-shift-?` repeat their shifted spellings, and the terminal adds `ctrl-shift-c` and `ctrl-insert` (copy) and `ctrl-shift-f` (search). `alt-9` runs `apollo-tabs.last`. A test checks that every key in `user/keys.json` has its Windows key or is dropped on purpose, so the two keymaps change together.

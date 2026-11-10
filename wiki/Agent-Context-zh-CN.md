@@ -25,3 +25,13 @@
 - 没有设置 `HC_TERMINAL_ID`（不在 Herdr 里）。
 - 缺少 `herdr-app` 或 `hc`。
 - 对 Claude 来说，`CLAUDE_CODE_ENTRYPOINT` 被设成了 `cli` 和 `sdk-cli` 以外的值。`sdk-cli` 是在终端里运行的 `claude -p`；桌面应用（`claude-desktop`）保持安静。
+
+## Windows
+
+`agent/herdr-context.ps1 <claude|copilot>` 是给 PowerShell 7（`pwsh`）用的同一个 hook。它输出同样的 JSON，不输出的情况和 9,000 字节的上限也都一样。因为 `herdr-app.exe` 是窗口程序，它会等进程结束后再读取 `herdr-app --skill` 的输出，并把 Windows 的换行（CRLF）转成 LF。
+
+```json
+{ "hooks": { "SessionStart": [ { "hooks": [ { "type": "command", "command": "pwsh -NoProfile -File C:/path/to/herdr-config/agent/herdr-context.ps1 claude" } ] } ] } }
+```
+
+对于 Copilot CLI，在它的会话开始 hook 中运行 `pwsh -NoProfile -File C:/path/to/herdr-config/agent/herdr-context.ps1 copilot`。

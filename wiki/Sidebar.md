@@ -42,4 +42,5 @@ The search button opens a filter at the top. Typing keeps the spaces whose name 
 ## Watch out
 
 - `SIZE_IS_ZOOMED` in `mods/apollo-spaces/lib.js` says the sidebar's reported width is design px. That is checked only at zoom 1. At other zooms, collapse and expand may pick the wrong width.
+- Every icon uses one line weight: 2 on the 24 grid, 3 for the status marks, and 2.4 for the Windows buttons. A new icon must follow it; `test/glyphs.test.js` checks it.
 - Mods don't share files, so `apollo-spaces`, `apollo-pane` and `apollo-status` each keep the same `branch.svg`. The status marks (`arc.svg`, `diamond.svg`, `check.svg`) are copied the same way. `folderName` is in both `apollo-tabs` and `apollo-spaces`, and `uniqueName` in both `apollo-tabs` and `apollo-specs`. Change all copies together.

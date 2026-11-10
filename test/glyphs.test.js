@@ -69,3 +69,52 @@ test("status marks read at 12 px: stroke 1.5-2 px (3-4 on the 24 grid) in every 
 test("folds have both glyphs: chevron (›, folded) and chevron-down (⌄, unfolded)", () => {
   assert.ok(has("apollo-spaces", "chevron-down"));
 });
+
+// One line weight per kind: UI glyphs 2, status marks 3 (see above), Windows caption buttons 2.4 (1 px at 10 px).
+const WIN = ["win-min", "win-max", "win-restore", "win-close"];
+const glyphSrc = () => svgs().map((p) => ({ p, name: p.split("/").pop().replace(/\.svg$/, ""), src: readFileSync(join(root, p), "utf8") }));
+const strokeOf = (src) => Number(/<svg\b[^>]*stroke-width="([\d.]+)"/.exec(src)?.[1]);
+
+test("one stroke weight: UI glyphs 2, status marks 3, Windows buttons 2.4", () => {
+  for (const { p, name, src } of glyphSrc()) {
+    const want = MARKS.includes(name) ? 3 : WIN.includes(name) ? 2.4 : 2;
+    assert.equal(strokeOf(src), want, p);
+  }
+});
+
+test("UI glyphs use round caps and joins; Windows buttons are sharp like Windows' own", () => {
+  for (const { p, name, src } of glyphSrc()) {
+    const head = /<svg\b[^>]*>/.exec(src)[0];
+    if (WIN.includes(name)) assert.match(head, /stroke-linecap="butt"[^>]*stroke-linejoin="miter"/, p);
+    else assert.match(head, /stroke-linecap="round"[^>]*stroke-linejoin="round"/, p);
+  }
+});
+
+test("frame glyphs share one frame: x 3, y 5, 18 by 14, corner 2.5", () => {
+  const FRAME = '<rect x="3" y="5" width="18" height="14" rx="2.5"/>';
+  for (const [mod, g] of [["apollo-chrome", "panel-open"], ["apollo-chrome", "panel-close"], ["apollo-pane", "split-right"], ["apollo-pane", "split-down"]]) {
+    assert.ok(readFileSync(join(root, "mods", mod, `${g}.svg`), "utf8").includes(FRAME), `${mod}/${g}`);
+  }
+});
+
+test("settings is sliders, not a sun; blocked is a solid diamond", () => {
+  const gear = readFileSync(join(root, "mods/apollo-chrome/gear.svg"), "utf8");
+  assert.equal((gear.match(/<circle\b/g) ?? []).length, 2, "two slider knobs");
+  assert.doesNotMatch(gear, /r="3"/, "no sun core");
+  for (const mod of ["apollo-spaces", "apollo-tabs", "apollo-pane"]) {
+    assert.match(readFileSync(join(root, "mods", mod, "diamond.svg"), "utf8"), /<path[^>]*fill="currentColor"/, mod);
+  }
+});
+
+test("copies of a glyph are byte-identical across mods", () => {
+  const by = new Map();
+  for (const { p, name, src } of glyphSrc()) (by.get(name) ?? by.set(name, []).get(name)).push([p, src]);
+  for (const [name, list] of by) for (const [p, src] of list) assert.equal(src, list[0][1], `${p} differs from ${list[0][0]} (${name})`);
+});
+
+test("Windows close is no larger than maximize", () => {
+  const nums = (s) => [...s.matchAll(/\d+(\.\d+)?/g)].map((m) => Number(m[0]));
+  const c = nums(readFileSync(join(root, "mods/apollo-tabs/win-close.svg"), "utf8").split("<path")[1]);
+  const [, , maxW] = nums(readFileSync(join(root, "mods/apollo-tabs/win-max.svg"), "utf8").split("<rect")[1]);
+  assert.ok(Math.max(...c) - Math.min(...c) <= maxW, `close spans ${Math.max(...c) - Math.min(...c)}, max ${maxW}`);
+});

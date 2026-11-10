@@ -53,7 +53,7 @@ Left to right:
   - `apollo-specs`: lists `docs/specs/*/*.md` with `find` and `readTextFile`; as a pane (`props: {file, on}`) it renders one spec. Calls `pane.split`, `tab.new`, `notify`.
   - `apollo-status`: read-only status bar.
   - Shipped mods used by name: `files`, `menu`, `worktree`.
-- **Art**: original 24-grid SVG glyphs (`plus`, `gear`, `search`, `panel-close`, `panel-open`, `chevron`, `chevron-down`, `branch`, `pin`, `arc`, `diamond`, `check`, `files`, `changes`, `specs`, `more`, `close`, split and zoom icons), and the preview `layouts/apollo.svg`.
+- **Art**: original 24-grid SVG glyphs (`plus`, `gear`, `search`, `panel-close`, `panel-open`, `chevron`, `chevron-down`, `branch`, `pin`, `arc`, `diamond`, `check`, `files`, `changes`, `specs`, `more`, `close`, split and zoom icons, the admin shield and the Windows buttons), and the preview `layouts/apollo.svg`. One line weight: 2 with round caps and joins; the status marks 3, with a solid `diamond`; the Windows buttons 2.4 (1 px at 10 px), sharp like Windows' own. Frame icons share one frame: `x 3, y 5, 18 × 14, rx 2.5`. `gear` is two sliders. `test/glyphs.test.js` checks all of this.
 
 ## Watch out
 

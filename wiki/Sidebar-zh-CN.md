@@ -42,4 +42,5 @@ Herdr 用编号称呼没人命名的标签页：1、2、3。Apollo 会给它创�
 ## 注意
 
 - `mods/apollo-spaces/lib.js` 里的 `SIZE_IS_ZOOMED` 认为侧边栏报告的宽度是设计像素。这只在缩放为 1 时验证过。在其他缩放下，收起和展开可能选错宽度。
+- 所有图标使用同一种线宽：24 网格上为 2，状态标记为 3，Windows 按钮为 2.4。新图标也要遵守；`test/glyphs.test.js` 会检查。
 - mod 之间不能共享文件，所以 `apollo-spaces`、`apollo-pane` 和 `apollo-status` 各自保存同一个 `branch.svg`。状态标记（`arc.svg`、`diamond.svg`、`check.svg`）也是这样复制的。`folderName` 同时在 `apollo-tabs` 和 `apollo-spaces` 里，`uniqueName` 同时在 `apollo-tabs` 和 `apollo-specs` 里。修改时要一起改所有副本。

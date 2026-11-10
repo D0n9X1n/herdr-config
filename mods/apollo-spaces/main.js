@@ -3,11 +3,11 @@ import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import {
   spaces, agents, panes, exec, run, openOverlay, closeOverlay, setAgentOrder, shared, setShared, settings, theme, layout,
-  props as herdrProps,
+  props as herdrProps, focused, home,
 } from "herdr";
 import {
   spacesView, agentOrder, guardWidth, guardTarget, designWidth, isCollapsed, clickSpace, clickAgent, spaceMenu, machineMenu,
-  newSpaceHere, foldKeys, probeGit, spaceCwd,
+  newSpaceHere, newSpace, foldKeys, probeGit, spaceCwd,
 } from "./lib.js";
 
 const FALLBACK = {
@@ -77,7 +77,7 @@ export default class Spaces extends View {
     return h_flex().id("new-space").h(32).px(10).gap(8).items_center().rounded(8).flex_none()
       .bg(col("raised")).border(1).border_color(col("border"))
       .hover((s) => s.border_color(col("input")))
-      .on_click(() => run("space.new"))
+      .on_click(() => newSpace({ run }, { cwd: focused()?.cwd, home: home() }))
       .child(glyph("plus", 16, "foreground"))
       .child(div().text_size(13).font_medium().text_color(col("foreground")).child("New space"));
   }
@@ -105,6 +105,7 @@ export default class Spaces extends View {
     const markNode = r.children.find((c) => ["arc", "diamond", "check"].includes(c.kind));
     const tile = by.tile.attrs;
     let el = h_flex().id(a.id).h(a.height).px(8).gap(8).items_center().rounded(8)
+      .tooltip(by.name.attrs.text)
       .on_click(() => clickSpace(space, { run }))
       .on_mouse_down("right", () => spaceMenu(space, { openOverlay }));
     el = a.fill ? el.bg(col(a.fill)) : el.hover((s) => s.bg(col("raised")));
@@ -156,7 +157,7 @@ export default class Spaces extends View {
     return v_flex().size_full().p(4).child(
       h_flex().id("new-space-here").h(32).px(8).gap(8).items_center().rounded(6)
         .hover((s) => s.bg(col("raised")))
-        .on_click(() => { newSpaceHere({ machine: p.machine ?? null }, { run }); closeOverlay(p.overlay); })
+        .on_click(() => { newSpaceHere({ machine: p.machine ?? null }, { run }, { cwd: focused()?.cwd, home: home() }); closeOverlay(p.overlay); })
         .child(glyph("plus", 16, "foreground"))
         .child(div().text_size(13).text_color(col("foreground")).child("New space here")));
   }

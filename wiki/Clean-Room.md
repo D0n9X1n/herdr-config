@@ -16,7 +16,7 @@ Apollo was built only from these:
 ## Not allowed
 
 - Anything under `~/.config/herdr-app/mods/` or `~/.config/herdr-app/layouts/`, except the data file above.
-- The code of any shipped mod. Shipped mods (`files`, `menu`, `worktree`, `machine-add`) are used by name only.
+- The code of any shipped mod. Shipped mods (`files`, `menu`, `worktree`) are used by name only.
 
 ## How
 

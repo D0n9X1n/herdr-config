@@ -83,7 +83,7 @@ for (const machine of [null, "devbox"]) {
     const spec = { path: "docs/specs/pending/x.md" };
     workOnIt(spec, { space: space(machine), repo: "/w/repo", agents: [agent("codex"), agent("claude")] }, r);
     assert.deepEqual(r.calls, [{ fn: "run", name: "tab.new", args: {
-      space: space(machine).id, folder: "/w/repo", argv: ["claude"], task: "Work on the spec docs/specs/pending/x.md. Read it first.",
+      space: space(machine).id, name: "claude", folder: "/w/repo", argv: ["claude"], task: "Work on the spec docs/specs/pending/x.md. Read it first.",
     } }]);
   });
 }

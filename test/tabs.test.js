@@ -12,9 +12,9 @@ test("pills take the icon from the tab's agent pane, else its first pane", () =>
   assert.equal(pills[0].tint, true);
 });
 
-test("a numbered tab shows its program name; a named tab keeps its name", () => {
+test("a numbered tab shows its program name, a shell its folder; a named tab keeps its name", () => {
   const pills = tabPills(tabSpace(), tabPanes());
-  assert.deepEqual(pills.map((p) => p.label), ["Claude Code", "fix login", "zsh"]);
+  assert.deepEqual(pills.map((p) => p.label), ["Claude Code", "fix login", "w"]);
 });
 
 test("pills carry active and status; a tab with no panes falls back to its own name", () => {

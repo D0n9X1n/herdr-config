@@ -3,19 +3,54 @@
 export const activeSpace = (spaces) => (spaces ?? []).find((s) => s.active) ?? null;
 
 // One pill per tab of the space: icon from the tab's agent pane, else its first pane.
-// A tab nobody named is called by its program's name.
-export function tabPills(space, panes) {
+// A tab nobody named is called by its program's name; a shell by its folder, never its number.
+export function tabPills(space, panes, { home = "" } = {}) {
   if (!space) return [];
   return space.tabs.map((t) => {
     const own = (panes ?? []).filter((p) => p.tab === t.id);
     const shown = own.find((p) => p.program?.agent || p.status) ?? own[0] ?? null;
     const prog = shown?.program ?? null;
+    const auto = prog && !prog.shell ? prog.name : (folderName(shown?.cwd, home) ?? prog?.name);
     return {
       id: t.id, active: !!t.active, status: t.status ?? null,
-      label: t.named ? t.name : (prog?.name ?? t.name),
+      label: t.named ? t.name : (auto ?? t.name),
       icon: prog?.icon ?? null, tint: !!prog?.tint,
     };
   });
+}
+
+// ---- Names for new tabs and spaces ----
+// Herdr calls a tab nobody named by its number; Apollo names each tab it makes. apollo-spaces and
+// apollo-specs keep copies of folderName / uniqueName (mods don't share files): change them together.
+
+// The last folder of a path ("/" or "\\"), "~" at home (any case on Windows); null for none or the root.
+export function folderName(cwd, home = "") {
+  const trim = (s) => String(s ?? "").replace(/[\\/]+$/, "");
+  const path = trim(cwd);
+  if (!path) return null;
+  const win = /^[a-z]:|\\/i.test(path);
+  const h = trim(home);
+  if (h && (win ? path.toLowerCase() === h.toLowerCase() : path === h)) return "~";
+  return path.split(/[\\/]/).pop() || null;
+}
+
+// base, else "base 2", "base 3", ... : the first not taken.
+export function uniqueName(base, taken) {
+  const used = new Set(taken ?? []);
+  if (!used.has(base)) return base;
+  let n = 2;
+  while (used.has(`${base} ${n}`)) n += 1;
+  return `${base} ${n}`;
+}
+
+// A new tab's name in space: the agent's name, else the folder of the space's focused pane (else its
+// first pane, else the space folder), else "Terminal"; unique among the space's tab names.
+export function newTabName(space, panes, { home = "", agent = null } = {}) {
+  const ids = new Set((space?.tabs ?? []).map((t) => t.id));
+  const own = (panes ?? []).filter((p) => ids.has(p.tab));
+  const pane = own.find((p) => p.focused) ?? own[0] ?? null;
+  const base = agent ?? folderName(pane?.cwd, home) ?? folderName(space?.folder, home) ?? "Terminal";
+  return uniqueName(base, (space?.tabs ?? []).map((t) => t.name));
 }
 
 export const selectTab = (tab, { run }) => run("tab.select", { id: tab.id });
@@ -26,10 +61,23 @@ export function onWheel(dy, { run }) {
   else if (dy < 0) run("tab.prev");
 }
 
-// nextCommand() handler. `last` selects the active space's last tab by id. Returns whether it handled c.
-export function handleCommand(c, spaces, { run }) {
-  if (c !== "last") return false;
+// nextCommand() handler. Returns whether it handled c.
+// `last` selects the active space's last tab by id. `terminal` and `space` (the Apollo layout's new-tab and
+// new-space keys) make a named tab, or a space whose first tab is named.
+export function handleCommand(c, spaces, { run }, { panes = [], home = "", cwd = null } = {}) {
   const sp = activeSpace(spaces);
+  if (c === "terminal") {
+    const name = newTabName(sp, panes, { home });
+    run("tab.new", sp ? { space: sp.id, name } : { name });
+    return true;
+  }
+  if (c === "space") {
+    // The new space starts in the focused terminal's folder (focused().cwd), so its first tab is called after it.
+    const here = cwd ?? (panes ?? []).find((p) => p.focused)?.cwd;
+    run("space.new", { tab: folderName(here, home) ?? "Terminal" });
+    return true;
+  }
+  if (c !== "last") return false;
   const last = sp?.tabs?.[sp.tabs.length - 1];
   if (!last) return false;
   run("tab.select", { id: last.id });
@@ -64,12 +112,13 @@ export function plusMenu(agents) {
   ]);
 }
 
-export function pickPlus(item, space, { run, openOverlay }) {
+// Tabs and spaces made here are named (see newTabName); ctx is { panes, home, cwd: focused().cwd }.
+export function pickPlus(item, space, { run, openOverlay }, { panes = [], home = "", cwd = null } = {}) {
   const a = item.attrs;
   switch (a.action) {
-    case "terminal": return run("tab.new", { space: space.id });
-    case "agent": return run("tab.new", { space: space.id, argv: a.run });
-    case "space": return run("space.new");
+    case "terminal": return run("tab.new", { space: space.id, name: newTabName(space, panes, { home }) });
+    case "agent": return run("tab.new", { space: space.id, name: newTabName(space, panes, { home, agent: a.label }), argv: a.run });
+    case "space": return handleCommand("space", [], { run }, { panes, home, cwd });
     case "worktree": return openOverlay({ mod: "worktree", kind: "dialog", props: { space: space.id, action: a.worktree } });
     default: return null;
   }

@@ -4,7 +4,7 @@ import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import {
   spaces, panes, run, openOverlay, closeOverlay, nextCommand, knownAgents, layout, readTextFile, appHome, theme,
-  props as herdrProps, window as herdrWindow, hc,
+  props as herdrProps, window as herdrWindow, hc, home, focused,
 } from "herdr";
 import {
   activeSpace, tabPills, selectTab, closeTab, onWheel, handleCommand, loadAgents, plusMenu, pickPlus,
@@ -49,7 +49,7 @@ export default class Tabs extends View {
       for (;;) {
         const c = await nextCommand();
         if (c === "menu") this.openPlus();
-        else handleCommand(c, spaces(), { run });
+        else handleCommand(c, spaces(), { run }, { panes: panes(), home: home(), cwd: focused()?.cwd });
         cx.notify();
       }
     });
@@ -65,6 +65,7 @@ export default class Tabs extends View {
 
   pill(p, admin) {
     let el = h_flex().id(`tab-${p.id}`).h(28).px(10).gap(6).items_center().rounded(6).flex_none()
+      .tooltip(p.label)
       .on_mouse_down("left", stop)
       .on_click(() => selectTab(p, { run }));
     el = p.active ? el.bg(col("selected")) : el.hover((s) => s.bg(col("raised")));
@@ -118,7 +119,7 @@ export default class Tabs extends View {
       const a = n.attrs;
       let el = h_flex().id(a.id).h(30).px(8).gap(8).items_center().rounded(6)
         .hover((s) => s.bg(col("raised")))
-        .on_click(() => { pickPlus(n, space, { run, openOverlay }); done(); });
+        .on_click(() => { pickPlus(n, space, { run, openOverlay }, { panes: panes(), home: home(), cwd: focused()?.cwd }); done(); });
       if (a.icon) el = el.child((a.tint ? svg(a.icon).text_color(col("muted")) : image(a.icon)).size(14).flex_none());
       el = el.child(div().flex_1().text_size(13).text_color(col("foreground")).truncate().child(a.label));
       if (a.shortcut) el = el.child(div().text_size(12).text_color(col("dim")).child(a.shortcut));
@@ -151,7 +152,7 @@ export default class Tabs extends View {
           const d = e.delta_lines?.y ?? e.delta?.y ?? 0;
           onWheel(Math.sign(d), { run });
         })
-        .children(tabPills(sp, panes()).map((p) => this.pill(p, showAdmin(this.admin, sp)))))
+        .children(tabPills(sp, panes(), { home: home() }).map((p) => this.pill(p, showAdmin(this.admin, sp)))))
       .child(h_flex().id("plus").size(28).rounded(6).flex_none().items_center().justify_center()
         .hover((s) => s.bg(col("raised")))
         .on_mouse_down("left", stop)

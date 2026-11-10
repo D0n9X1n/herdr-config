@@ -86,8 +86,8 @@ test("New space here targets this computer with machine \"\" and a remote by nam
   newSpaceHere(groups[0], r);
   newSpaceHere(groups[1], r);
   assert.deepEqual(r.calls, [
-    { fn: "run", name: "space.new", args: { machine: "" } },
-    { fn: "run", name: "space.new", args: { machine: "devbox" } },
+    { fn: "run", name: "space.new", args: { machine: "", tab: "Terminal" } },
+    { fn: "run", name: "space.new", args: { machine: "devbox", tab: "devbox" } },
   ]);
 });
 

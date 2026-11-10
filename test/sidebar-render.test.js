@@ -54,12 +54,23 @@ test("collapsed: one plus; every space named; brand holds the app icon and panel
   assert.ok(texts(s).includes("ann"));
 });
 
-test("footer: settings and add-machine rows with gear and plug glyphs, both states", () => {
+test("footer: the settings row with its gear and the account, no Add machine, both states", () => {
   for (const collapsed of [false, true]) {
     const f = sidebar(collapsed).children[2];
-    assert.deepEqual(findAll(f, (n) => n.attrs?.id).map((n) => n.attrs.id), ["settings", "add-machine", "account"]);
+    assert.deepEqual(findAll(f, (n) => n.attrs?.id).map((n) => n.attrs.id), ["settings", "account"]);
     assert.equal(count(f, "gear"), 1);
-    assert.equal(count(f, "plug"), 1);
+    assert.equal(count(f, "plug"), 0);
+    assert.ok(!texts(f).includes("Add machine"));
     assert.equal(findAll(f, (n) => n.kind === "avatar")[0].attrs.text, "A");
+  }
+});
+
+test("Windows: the app icon sits at x 12 (no traffic lights); footer and spaces render as on macOS", () => {
+  for (const collapsed of [false, true]) {
+    const win = sidebar(collapsed, { platform: "windows" }), mac = sidebar(collapsed);
+    assert.equal(findAll(win, (n) => n.kind === "app-icon")[0].attrs.x, 12);
+    assert.deepEqual(win.children[1], mac.children[1], "spaces");
+    assert.deepEqual(win.children[2], mac.children[2], "footer");
+    assert.deepEqual(findAll(win.children[2], (n) => n.attrs?.id).map((n) => n.attrs.id), ["settings", "account"]);
   }
 });

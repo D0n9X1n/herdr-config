@@ -30,7 +30,6 @@ export function expand({ saved }, { run }) {
 }
 
 export const settings = ({ run }) => run("app.settings");
-export const addMachine = ({ run }) => run("mod.open", { name: "machine-add" });
 
 export function account(home) {
   const name = String(home ?? "").replace(/\/+$/, "").split("/").pop() ?? "";
@@ -52,12 +51,11 @@ export function brandView({ collapsed, platform = "macos", fullscreen = false })
   ]);
 }
 
-// Footer: Settings, Add machine, then the account row ("N agents" only when expanded).
+// Footer: Settings, then the account row ("N agents" only when expanded).
 export function footerView({ collapsed, home, agentCount = 0 }) {
   const acct = account(home);
   return node("footer", { collapsed }, [
     node("footer-row", { id: "settings", label: "Settings" }, [node("gear", { color: "dim" })]),
-    node("footer-row", { id: "add-machine", label: "Add machine" }, [node("plug", { color: "dim" })]),
     node("account", { id: "account" }, [
       node("avatar", { text: acct.initial }),
       node("account-name", { text: acct.name, color: "foreground" }),

@@ -70,8 +70,27 @@ export function agentOrder(spaces, agents, _viewState = {}) {
   return spaces.flatMap((s) => (by.get(s.id) ?? []).map((a) => a.address));
 }
 
+// The New space button: Herdr's default machine (the focused space's), first tab named after the focused folder.
+export const newSpace = ({ run }, { cwd = null, home = "" } = {}) => run("space.new", { tab: folderName(cwd, home) ?? "Terminal" });
+
 // "" targets this computer explicitly, which matters while a remote space is active.
-export const newSpaceHere = (group, { run }) => run("space.new", { machine: group.machine ?? "" });
+// The new space's first tab: the machine's name for a remote space (it starts in that machine's home), else
+// the focused folder (the space starts there). A copy of apollo-tabs' folderName: change them together.
+export function newSpaceHere(group, { run }, { cwd = null, home = "" } = {}) {
+  const tab = group.machine ?? folderName(cwd, home) ?? "Terminal";
+  return run("space.new", { machine: group.machine ?? "", tab });
+}
+
+// The last folder of a path ("/" or "\\"), "~" at home (any case on Windows); null for none or the root.
+export function folderName(cwd, home = "") {
+  const trim = (s) => String(s ?? "").replace(/[\\/]+$/, "");
+  const path = trim(cwd);
+  if (!path) return null;
+  const win = /^[a-z]:|\\/i.test(path);
+  const h = trim(home);
+  if (h && (win ? path.toLowerCase() === h.toLowerCase() : path === h)) return "~";
+  return path.split(/[\\/]/).pop() || null;
+}
 
 export const spaceMenu = (space, { openOverlay }) =>
   openOverlay({ mod: "menu", kind: "popup", props: { tab: "space", target: { space: space.id } } });

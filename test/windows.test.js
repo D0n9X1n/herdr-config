@@ -79,6 +79,25 @@ test("plusAnchor: the window buttons push ⊕ left by their width; without them 
   assert.deepEqual(plusAnchor({ layout: APOLLO, rootW: 1400, panelsW: 270, buttonsW: 138 }), { x: 1381 + 8 - 138 - 4 - 220, y: 45 });
 });
 
+test("tabs: on Windows the + popup opens at plusAnchor for the rendered row (root gap 4, no other padding)", async () => {
+  const APOLLO = json("layouts/apollo.json");
+  const m = await loadMod("mods/apollo-tabs", { data: { ...tabsData(WINDOWS), layout: APOLLO } });
+  m.resize("root", { width: 1400, height: 40 });
+  m.resize("panels", { width: 270, height: 28 });
+  m.click("plus");
+  const opened = m.rec.calls.filter((c) => c.fn === "openOverlay").map((c) => c.args).at(-1);
+  // ⊕ right edge: card left 263 + 1400 - buttons 138 - gap 4 - panels 270 - gap 4.
+  assert.deepEqual(opened.at, { x: 263 + 1400 - 138 - 4 - 270 - 4 - 220, y: 45 });
+  assert.deepEqual(opened.at, plusAnchor({ layout: APOLLO, rootW: 1400, panelsW: 270, buttonsW: 3 * WIN_BUTTON_W }));
+  // plusAnchor assumes exactly that spacing: the root's 4 px gap, no right padding, no padding on the group.
+  const named = (id) => { const out = []; (function go(n) { const el = n?.__el; if (!el) return; if (el.id === id) out.push(el);
+    for (const c of el.children) go(c); for (const call of el.calls) for (const a of call.args) if (a?.__el) go(a); })(m.tree()); return out[0]; };
+  const padding = (el) => el.calls.filter((c) => /^(p|px|pr|pl|pt|pb|py)$/.test(c.name)).map((c) => `${c.name}(${c.args[0]})`);
+  assert.deepEqual(named("root").calls.filter((c) => c.name === "gap").map((c) => c.args[0]), [4]);
+  assert.deepEqual(padding(named("root")), ["pl(8)"]);
+  assert.deepEqual(padding(named("window-buttons")), []);
+});
+
 test("window glyphs: 24-grid, stroke only, no image or link", () => {
   for (const g of ["win-min", "win-max", "win-restore", "win-close"]) {
     const s = readFileSync(join(root, "mods/apollo-tabs", `${g}.svg`), "utf8");

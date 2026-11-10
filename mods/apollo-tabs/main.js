@@ -147,7 +147,7 @@ export default class Tabs extends View {
       .child(h_flex().id("panels").flex_none().pl(12).gap(4).items_center()
         .on_size_change((sz) => { this.panelsW = sz.width; })
         .children(PANELS.map(([child, label]) => this.panelButton(child, label, st))));
-    if (buttons.length) root = root.child(h_flex().id("window-buttons").h_full().flex_none().pl(4)
+    if (buttons.length) root = root.child(h_flex().id("window-buttons").h_full().flex_none()
       .children(buttons.map((b) => this.windowButton(b))));
     return root;
   }

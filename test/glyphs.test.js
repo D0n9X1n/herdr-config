@@ -112,9 +112,35 @@ test("copies of a glyph are byte-identical across mods", () => {
   for (const [name, list] of by) for (const [p, src] of list) assert.equal(src, list[0][1], `${p} differs from ${list[0][0]} (${name})`);
 });
 
-test("Windows close is no larger than maximize", () => {
-  const nums = (s) => [...s.matchAll(/\d+(\.\d+)?/g)].map((m) => Number(m[0]));
-  const c = nums(readFileSync(join(root, "mods/apollo-tabs/win-close.svg"), "utf8").split("<path")[1]);
-  const [, , maxW] = nums(readFileSync(join(root, "mods/apollo-tabs/win-max.svg"), "utf8").split("<rect")[1]);
-  assert.ok(Math.max(...c) - Math.min(...c) <= maxW, `close spans ${Math.max(...c) - Math.min(...c)}, max ${maxW}`);
+// Ink bounds of an M/L/l path (absolute and relative), widened by half the stroke.
+function inkBox(svg) {
+  const half = strokeOf(svg) / 2;
+  let x = 0, y = 0;
+  const xs = [], ys = [];
+  for (const [, cmd, args] of svg.matchAll(/([MLml])\s*([-\d.\s,]+)/g)) {
+    const n = args.trim().split(/[\s,]+/).map(Number);
+    for (let i = 0; i < n.length; i += 2) {
+      if (cmd === cmd.toLowerCase()) { x += n[i]; y += n[i + 1]; } else { x = n[i]; y = n[i + 1]; }
+      xs.push(x); ys.push(y);
+    }
+  }
+  for (const [, rx, ry, rw, rh] of svg.matchAll(/<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)) {
+    xs.push(+rx, +rx + +rw); ys.push(+ry, +ry + +rh);
+  }
+  return { x0: Math.min(...xs) - half, y0: Math.min(...ys) - half, x1: Math.max(...xs) + half, y1: Math.max(...ys) + half };
+}
+
+test("inkBox reads relative steps: an oversized close would be caught", () => {
+  const big = '<svg viewBox="0 0 24 24" stroke-width="2.4"><path d="M4.8 4.8l19.2 19.2"/></svg>';
+  assert.equal(inkBox(big).x1, 24 + 1.2);
+});
+
+test("Windows close is no larger than maximize, and every Windows button stays inside the 24 grid", () => {
+  const read = (g) => readFileSync(join(root, "mods/apollo-tabs", `${g}.svg`), "utf8");
+  const close = inkBox(read("win-close")), max = inkBox(read("win-max"));
+  assert.ok(close.x1 - close.x0 <= max.x1 - max.x0 && close.y1 - close.y0 <= max.y1 - max.y0, JSON.stringify({ close, max }));
+  for (const g of WIN) {
+    const b = inkBox(read(g));
+    assert.ok(b.x0 >= 0 && b.y0 >= 0 && b.x1 <= 24 && b.y1 <= 24, `${g} ${JSON.stringify(b)}`);
+  }
 });

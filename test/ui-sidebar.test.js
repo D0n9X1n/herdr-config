@@ -184,7 +184,9 @@ test("spaces: an unborn repo shows its branch (probed); a non-repo folder shows 
   for (let i = 0; i < 5; i++) await new Promise((r) => setImmediate(r));
   m.render();
   assert.ok(rowTexts(m, "space-s1").texts.includes("main"), `unborn: ${rowTexts(m, "space-s1").texts}`);
-  assert.deepEqual(rowTexts(m, "space-s2").texts, ["HE", "herdr-config"], "non-repo: tile and name only");
+  assert.deepEqual(rowTexts(m, "space-s2").texts, ["herdr-config"], "non-repo: a folder tile and the name only");
+  assert.ok(svgPaths(m.tree()).some((x) => x.path === "mods/apollo-spaces/folder.svg"), "the non-repo tile is a folder");
+  assert.ok(svgPaths(m.tree()).some((x) => x.path === "mods/apollo-spaces/server.svg"), "the remote space's tile is a server");
   assert.ok(rowTexts(m, "space-devbox/s3").texts.includes("dev"));
 });
 
@@ -197,11 +199,11 @@ test("spaces: chevron ⌄ when unfolded, › when folded, none without agents", 
   assert.ok(!m.ids().includes("fold-devbox/s3"), "no agents → no chevron");
 });
 
-test("spaces: every status mark is an svg at an explicit 12 px", async () => {
+test("spaces: every status mark is an svg at an explicit 14 px", async () => {
   const m = await loadMod(SPACES, { data: data(), size: { width: 256, height: 600 } });
   const marks = svgPaths(m.tree()).filter((x) => /\/(arc|diamond|check)\.svg$/.test(x.path));
   assert.ok(marks.length >= 5, `marks: ${marks.length}`);
-  for (const x of marks) assert.ok(x.calls.some((c) => c.name === "size" && c.args[0] === 12), x.path);
+  for (const x of marks) assert.ok(x.calls.some((c) => c.name === "size" && c.args[0] === 14), x.path);
 });
 
 // ---- The Apollo logo: the brand row shows only mods/apollo-chrome/logo.png (20 px, radius 5), in both states ----

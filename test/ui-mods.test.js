@@ -570,7 +570,7 @@ test("tabs: once measured, + and `menu` open the popup under ⊕, right-aligned 
   assert.ok(m.ids().includes("panels"), "the panel buttons sit in a measured `panels` group");
 });
 
-// ---- Designer SHOULD: one branch glyph at 12 px wherever a branch shows ----
+// ---- Designer SHOULD: one branch glyph at 14 px wherever a branch shows ----
 const branchGlyphs = (m) => {
   const out = [];
   const walk = (n) => {
@@ -583,11 +583,11 @@ const branchGlyphs = (m) => {
   return out.map((el) => ({ path: el.args[0], size: el.calls.find((c) => c.name === "size")?.args[0] }));
 };
 
-test("pane header and status bar draw the 12 px branch glyph next to the branch", async () => {
+test("pane header and status bar draw the 14 px branch glyph next to the branch", async () => {
   const pane = await loadMod("mods/apollo-pane", { data: { panes: tabPanes() }, props: { pane: "p2" } });
-  assert.deepEqual(branchGlyphs(pane), [{ path: "mods/apollo-pane/branch.svg", size: 12 }]);
+  assert.deepEqual(branchGlyphs(pane), [{ path: "mods/apollo-pane/branch.svg", size: 14 }]);
   const status = await loadMod("mods/apollo-status", { data: { spaces: [tabSpace(1)], agents: [] } });
-  assert.deepEqual(branchGlyphs(status), [{ path: "mods/apollo-status/branch.svg", size: 12 }]);
+  assert.deepEqual(branchGlyphs(status), [{ path: "mods/apollo-status/branch.svg", size: 14 }]);
 });
 
 // ---- Review item 1: "Work on it" acts only on a spec that is shown ----
@@ -627,4 +627,11 @@ test("specs: a selection survives a refreshed list when its spec is still shown"
   m.render();
   m.click("work-on-it");
   assert.deepEqual(tasks(m), ["Work on the spec docs/specs/pending/c.md. Read it first."]);
+});
+
+test("+ menu: a hovered row is clearly selected (selected fill and an input border)", async () => {
+  const src = (await import("node:fs")).readFileSync(new URL("../mods/apollo-tabs/main.js", import.meta.url), "utf8");
+  const item = src.slice(src.indexOf("const item = (n) =>"), src.indexOf("const kids = []"));
+  assert.match(item, /\.hover\(\(s\) => s\.bg\(col\("selected"\)\)\.border_color\(col\("input"\)\)\)/);
+  assert.match(item, /\.border\(1\)\.border_color\(col\("popover"\)\)/, "rows keep a 1 px border in the popover color so hover does not shift them");
 });

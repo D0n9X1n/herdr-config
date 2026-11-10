@@ -14,7 +14,7 @@ export function tabPills(space, panes, { home = "" } = {}) {
     return {
       id: t.id, active: !!t.active, status: t.status ?? null,
       label: t.named ? t.name : (auto ?? t.name),
-      icon: prog?.icon ?? null, tint: !!prog?.tint,
+      ...(({ icon, tint, color }) => ({ icon, tint, iconColor: color }))(agentIcon(prog)),
     };
   });
 }
@@ -225,3 +225,11 @@ export async function checkElevation(hc) {
 
 // Remote spaces' terminals run on another machine, under another core.
 export const showAdmin = (state, space) => state === "elevated" && !!space && space.machine == null;
+
+// Claude Code shows Apollo's own star in Claude orange; other programs keep Herdr's icon. Copies of this
+// live in apollo-spaces, apollo-tabs and apollo-pane (mods don't share files): change them together.
+export const CLAUDE_ORANGE = "#d97757";
+export function agentIcon(prog) {
+  if (prog?.key === "claude") return { icon: "mods/apollo-tabs/star.svg", tint: true, color: CLAUDE_ORANGE };
+  return { icon: prog?.icon ?? null, tint: !!prog?.tint, color: null };
+}

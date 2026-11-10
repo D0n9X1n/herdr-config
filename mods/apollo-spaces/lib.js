@@ -25,10 +25,14 @@ export function contrast(a, b) {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-export function monogram(name) {
-  const letters = [...String(name ?? "")].filter((c) => /[\p{L}\p{N}]/u.test(c));
-  return (letters.length ? letters.slice(0, 2).join("") : String(name ?? "").slice(0, 2)).toUpperCase();
+// The space tile's glyph: a remote machine's server, home's house, a git space's repo, else a folder.
+export function tileGlyph(s, probed = null) {
+  if (s.machine != null) return "server";
+  if (s.name === "~") return "home";
+  if (s.branch || probed?.repo) return "repo";
+  return "folder";
 }
+
 
 // Groups in order: this computer (machine null) first, then remote machines by name.
 export function groupByMachine(spaces) {
@@ -164,7 +168,7 @@ function agentRow(a) {
   return node("agent", {
     id: `agent-${a.address}`, address: a.address, title: a.title, focused: a.focused,
     fill: a.focused ? "raised" : null, color: a.focused ? "foreground" : "muted",
-    icon: a.program?.icon ?? null, tint: !!a.program?.tint,
+    ...(({ icon, tint, color }) => ({ icon, tint, iconColor: color }))(agentIcon(a.program)),
   }, [...(a.pinned ? [node("pin", { color: "dim" })] : []), ...(m ? [m] : [])]);
 }
 
@@ -177,7 +181,7 @@ function spaceNode(s, agents, { collapsed, folded, git = {} }) {
   }, [
     // A fold chevron only when there is something to fold (agents).
     ...(collapsed || !agents.length ? [] : [node("chevron", { id: `fold-${s.id}`, folded: !!folded[s.id], color: active ? "solid_foreground" : "dim" })]),
-    node("tile", { color: spaceColor(s.id), text: monogram(s.name), ring: active ? 1.5 : 0, textColor: "solid_foreground" }),
+    node("tile", { color: spaceColor(s.id), glyph: tileGlyph(s, git[s.id]), ring: active ? 1.5 : 0, textColor: "solid_foreground" }),
     node("name", { text: s.name, color: fg }),
     // Git spaces show their branch (Herdr's, else the probed one: unborn repos too); other folders show the name alone.
     ...(collapsed || !branchOf(s, git) ? [] : [node("branch", { text: branchOf(s, git), color: active ? "solid_foreground" : "dim" })]),
@@ -235,4 +239,12 @@ export function spacesView({ spaces, agents = [], collapsed = false, folded = {}
     children.push(node("group", { key: g.key }, gk));
   }
   return node("spaces", { collapsed }, children);
+}
+
+// Claude Code shows Apollo's own star in Claude orange; other programs keep Herdr's icon. Copies of this
+// live in apollo-spaces, apollo-tabs and apollo-pane (mods don't share files): change them together.
+export const CLAUDE_ORANGE = "#d97757";
+export function agentIcon(prog) {
+  if (prog?.key === "claude") return { icon: "mods/apollo-spaces/star.svg", tint: true, color: CLAUDE_ORANGE };
+  return { icon: prog?.icon ?? null, tint: !!prog?.tint, color: null };
 }

@@ -22,4 +22,4 @@ Work on it starts the first installed agent, Claude first, in a new tab named af
 
 ## The + menu
 
-The ⊕ button opens a 220 px menu under it, right-aligned to it: Terminal, Start an agent (installed agents only), New space, New worktree and Open worktree. Terminal, the agents and New space name the tab they make (see [Sidebar](Sidebar)). Before the tab row has been measured, the menu opens at the pointer.
+The + button opens a 220 px menu under it, right-aligned to it: Terminal, Start an agent (installed agents only), New space, New worktree and Open worktree. Terminal, the agents and New space name the tab they make (see [Sidebar](Sidebar)). Before the tab row has been measured, the menu opens at the pointer. The row under the pointer is highlighted with a light fill and border.

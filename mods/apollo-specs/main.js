@@ -110,14 +110,14 @@ export default class Specs extends View {
     const tab = (s) => {
       let el = h_flex().id(`status-${s}`).h(24).px(8).gap(4).items_center().rounded(6)
         .on_click((_e, cx) => { this.status = s; cx.notify(); })
-        .child(div().text_size(12).text_color(col(s === this.status ? "foreground" : "muted")).child(`${s} ${counts[s]}`));
+        .child(div().text_size(13).font_light().text_color(col(s === this.status ? "foreground" : "muted")).child(`${s} ${counts[s]}`));
       return s === this.status ? el.bg(col("selected")) : el.hover((x) => x.bg(col("raised")));
     };
     const row = (s) => {
       let el = h_flex().id(rowId(s)).h(28).px(8).gap(8).items_center().rounded(6)
         .on_click(() => { this.sel = s.path; openSpec(s, this.on, { run }); })
-        .child(div().flex_1().min_w(0).text_size(12).text_color(col("foreground")).truncate().child(s.title))
-        .child(div().text_size(11).text_color(col("dim")).child(s.priority ?? ""));
+        .child(div().flex_1().min_w(0).text_size(13).font_light().text_color(col("foreground")).truncate().child(s.title))
+        .child(div().text_size(12).font_light().text_color(col("dim")).child(s.priority ?? ""));
       return this.sel === s.path ? el.bg(col("selected")) : el.hover((x) => x.bg(col("raised")));
     };
     return v_flex().id("root").size_full().p(8).gap(6)
@@ -126,7 +126,7 @@ export default class Specs extends View {
         .track_focus(this.focus)
         .on_click(() => this.focus.focus())
         .on_key_down((e, cx) => { this.onKey(e); cx.notify(); })
-        .child(div().text_size(12).text_color(col(this.query ? "foreground" : "dim")).truncate().child(this.query || "Filter specs")))
+        .child(div().text_size(13).font_light().text_color(col(this.query ? "foreground" : "dim")).truncate().child(this.query || "Filter specs")))
       .child(v_flex().id("specs").flex_1().gap(1).overflow_y_scrollbar().children(shown.map(row)))
       .child(h_flex().id("work-on-it").h(30).px(10).items_center().justify_center().rounded(6).bg(col("accent"))
         .on_click(() => {
@@ -135,6 +135,6 @@ export default class Specs extends View {
           const space = this.space && ((spaces() ?? []).find((s) => s.id === this.space.id) ?? this.space);
           if (spec && space) workOnIt(spec, { space, repo: this.repo, agents: this.agents }, { run, notify });
         })
-        .child(div().text_size(12).font_semibold().text_color(col("solid_foreground")).child("Work on it")));
+        .child(div().text_size(13).font_normal().text_color(col("solid_foreground")).child("Work on it")));
   }
 }

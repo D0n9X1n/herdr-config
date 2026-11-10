@@ -27,12 +27,19 @@ export function paneHeader(paneId, panes) {
   const kind = isMod ? undefined : MARKS[p.status];
   return {
     pane: p.pane,
-    icon: isMod ? null : (p.program?.icon ?? null),
-    tint: isMod ? false : !!p.program?.tint,
+    ...(({ icon, tint, color }) => (isMod ? { icon: null, tint: false, iconColor: null } : { icon, tint, iconColor: color }))(agentIcon(p.program)),
     title: p.title ?? "",
     folder: isMod ? null : base(p.cwd),
     branch: isMod ? null : (p.branch ?? null),
     mark: kind ? { kind, color: p.status } : null,
     focused: !!p.focused,
   };
+}
+
+// Claude Code shows Apollo's own star in Claude orange; other programs keep Herdr's icon. Copies of this
+// live in apollo-spaces, apollo-tabs and apollo-pane (mods don't share files): change them together.
+export const CLAUDE_ORANGE = "#d97757";
+export function agentIcon(prog) {
+  if (prog?.key === "claude") return { icon: "mods/apollo-pane/star.svg", tint: true, color: CLAUDE_ORANGE };
+  return { icon: prog?.icon ?? null, tint: !!prog?.tint, color: null };
 }

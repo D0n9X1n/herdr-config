@@ -14,7 +14,7 @@ import {
 
 const FALLBACK = {
   foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", selected: "#3c3836", border: "#3c3836",
-  working: "#fabd2f", blocked: "#fb4934", done: "#b8bb26", accent: "#fabd2f",
+  working: "#fabd2f", blocked: "#fb4934", done: "#b8bb26", accent: "#fabd2f", popover: "#1d2021", input: "#504945",
 };
 const col = (name) => theme()?.[name] ?? FALLBACK[name] ?? name;
 const glyph = (name, size, color) => svg(`mods/apollo-tabs/${name}.svg`).size(size).text_color(col(color));
@@ -70,19 +70,19 @@ export default class Tabs extends View {
       .on_click(() => selectTab(p, { run }));
     el = p.active ? el.bg(col("selected")) : el.hover((s) => s.bg(col("raised")));
     // First, so it is never read as the trailing red "blocked" status mark.
-    if (admin) el = el.child(glyph("admin", 12, "blocked").flex_none());
-    if (p.icon) el = el.child((p.tint ? svg(p.icon).text_color(col("muted")) : image(p.icon)).size(14).flex_none());
-    el = el.child(div().text_size(12).text_color(col(p.active ? "foreground" : "muted")).truncate().child(p.label));
+    if (admin) el = el.child(glyph("admin", 14, "blocked").flex_none());
+    if (p.icon) el = el.child((p.tint ? svg(p.icon).text_color(col(p.iconColor ?? "muted")) : image(p.icon)).size(14).flex_none());
+    el = el.child(div().text_size(13).font_light().text_color(col(p.active ? "foreground" : "muted")).truncate().child(p.label));
     if (MARKS[p.status]) {
-      const m = glyph(MARKS[p.status], 12, p.status).flex_none();
+      const m = glyph(MARKS[p.status], 14, p.status).flex_none();
       el = el.child(p.status === "working" ? m.spin(900) : m);
     }
     if (p.active) {
-      el = el.child(h_flex().id(`close-${p.id}`).size(16).rounded(4).items_center().justify_center()
+      el = el.child(h_flex().id(`close-${p.id}`).size(18).rounded(4).items_center().justify_center()
         .hover((s) => s.bg(col("raised")))
         .on_mouse_down("left", stop)
         .on_click((_e, cx) => { cx.stop_propagation(); closeTab(p, { run }); })
-        .child(glyph("close", 10, "dim")));
+        .child(glyph("close", 12, "dim")));
     }
     return el;
   }
@@ -94,8 +94,8 @@ export default class Tabs extends View {
       .on_click((_e, cx) => {
         cx.spawn(async () => panelClick(child, await loadPanelState({ layout, readTextFile, appHome }), { run }));
       })
-      .child(glyph(child, 14, on ? "foreground" : "dim"))
-      .child(div().text_size(12).text_color(col(on ? "foreground" : "muted")).child(label));
+      .child(glyph(child, 16, on ? "foreground" : "dim"))
+      .child(div().text_size(13).font_light().text_color(col(on ? "foreground" : "muted")).child(label));
     el = on ? el.bg(col("selected")) : el.hover((s) => s.bg(col("raised")));
     return el;
   }
@@ -117,12 +117,14 @@ export default class Tabs extends View {
     const done = () => closeOverlay(p.overlay);
     const item = (n) => {
       const a = n.attrs;
-      let el = h_flex().id(a.id).h(30).px(8).gap(8).items_center().rounded(6)
-        .hover((s) => s.bg(col("raised")))
+      // A hovered row takes the selected fill and an input border: clear against the popover surface.
+      let el = h_flex().id(a.id).h(30).px(8).gap(8).items_center().rounded(6).cursor_pointer()
+        .border(1).border_color(col("popover"))
+        .hover((s) => s.bg(col("selected")).border_color(col("input")))
         .on_click(() => { pickPlus(n, space, { run, openOverlay }, { panes: panes(), home: home(), cwd: focused()?.cwd }); done(); });
       if (a.icon) el = el.child((a.tint ? svg(a.icon).text_color(col("muted")) : image(a.icon)).size(14).flex_none());
-      el = el.child(div().flex_1().text_size(13).text_color(col("foreground")).truncate().child(a.label));
-      if (a.shortcut) el = el.child(div().text_size(12).text_color(col("dim")).child(a.shortcut));
+      el = el.child(div().flex_1().text_size(14).font_light().text_color(col("foreground")).truncate().child(a.label));
+      if (a.shortcut) el = el.child(div().text_size(13).font_light().text_color(col("dim")).child(a.shortcut));
       return el;
     };
     const kids = [];
@@ -130,7 +132,7 @@ export default class Tabs extends View {
       if (n.kind === "item") kids.push(item(n));
       else if (n.kind === "agent-section") {
         kids.push(div().h(1).bg(col("border")).flex_none(),
-          div().px(8).pt(6).pb(2).text_size(11).text_color(col("dim")).child(n.attrs.label),
+          div().px(8).pt(6).pb(2).text_size(12).font_light().text_color(col("dim")).child(n.attrs.label),
           ...n.children.map(item),
           div().h(1).bg(col("border")).flex_none());
       }
@@ -157,7 +159,7 @@ export default class Tabs extends View {
         .hover((s) => s.bg(col("raised")))
         .on_mouse_down("left", stop)
         .on_click(() => this.openPlus())
-        .child(glyph("more", 16, "dim")))
+        .child(glyph("more", 18, "dim")))
       .child(h_flex().id("panels").flex_none().pl(12).gap(4).items_center()
         .on_size_change((sz) => { this.panelsW = sz.width; })
         .children(PANELS.map(([child, label]) => this.panelButton(child, label, st))));

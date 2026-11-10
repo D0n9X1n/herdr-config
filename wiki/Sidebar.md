@@ -6,7 +6,22 @@
 
 Each space shows a two-letter tile, its name, its branch and one status mark. Under a space, each agent has a row with its icon, title and mark. A working agent shows a spinning arc, a blocked one a diamond, and a done one a check; an idle one shows nothing. A space shows its most urgent agent: blocked, then done, then working.
 
-Click a space to select it; right-click it for Herdr's space menu. Click an agent to focus it.
+Click a space to select it; right-click it for Herdr's space menu. Click an agent to focus it. Rest the pointer on a space for half a second to see its full name, also when the sidebar is collapsed.
+
+## Names
+
+Herdr calls a tab nobody named by its number: 1, 2, 3. Apollo names every tab it makes:
+
+- A terminal tab is called after its folder, such as `api`; the home folder is `~`.
+- An agent tab is called after the agent, such as `Claude Code`.
+- A name already used in the space gets a number: `api 2`.
+- A new space's first tab is called after the folder the space starts in. In a new space on another machine, it is called after the machine.
+
+This covers New space, New space here, the + menu, Work on it, and the new-tab and new-space keys (see [Keys](Keys)). A space keeps no name of its own, so Herdr keeps calling it after its repo or folder. A tab made some other way, such as by a script, keeps Herdr's number, but its pill shows the program, or the folder for a shell. Rename a tab with Herdr's rename; an empty name gives back Herdr's number.
+
+## Footer
+
+The footer has the Settings row and the account row; it is 96 px tall. To add a machine, run `hc machine add <host>` in a terminal.
 
 ## Folds
 
@@ -27,4 +42,4 @@ The search button opens a filter at the top. Typing keeps the spaces whose name 
 ## Watch out
 
 - `SIZE_IS_ZOOMED` in `mods/apollo-spaces/lib.js` says the sidebar's reported width is design px. That is checked only at zoom 1. At other zooms, collapse and expand may pick the wrong width.
-- Mods don't share files, so `apollo-spaces`, `apollo-pane` and `apollo-status` each keep the same `branch.svg`. The status marks (`arc.svg`, `diamond.svg`, `check.svg`) are copied the same way. Change all copies together.
+- Mods don't share files, so `apollo-spaces`, `apollo-pane` and `apollo-status` each keep the same `branch.svg`. The status marks (`arc.svg`, `diamond.svg`, `check.svg`) are copied the same way. `folderName` is in both `apollo-tabs` and `apollo-spaces`, and `uniqueName` in both `apollo-tabs` and `apollo-specs`. Change all copies together.

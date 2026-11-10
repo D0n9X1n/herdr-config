@@ -132,8 +132,8 @@ jq -e '.activeRowBg == "#fabd2f" and .trafficViolations == 0' "$OUT/expanded.mea
 
 # The preview: the Changes shot with the person's own rows painted chrome. Sidebar geometry (design px):
 # brand 48, New space 32 + 12 gap, then the two fixture rows (44 each, 2 apart) end at 48+32+12+44+2+44 = 182.
-# The band runs from there to the footer's top (window height - 130), across the sidebar's width.
-footer_top=$(jq '.bounds[3] - 130' "$HERDR_HOME/window.json")
+# The band runs from there to the footer's top (window height - 96), across the sidebar's width.
+footer_top=$(jq '.bounds[3] - 96' "$HERDR_HOME/window.json")
 node "$REPO/scripts/png-mask-rows.mjs" "$OUT/changes.png" "$OUT/preview.png" --window-width "$ww" --zoom "$z" \
   --x0 0 --x1 "$start" --y0 182 --y1 "$footer_top" || fail "mask preview"
 printf '%s\n' "$(node "$REPO/scripts/measure.js" "$OUT/preview.png" --window-width "$ww" --zoom "$z" --mask "$OUT/mask.png")" > "$OUT/preview.measure.json"

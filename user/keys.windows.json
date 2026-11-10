@@ -113,5 +113,10 @@
     "ctrl-shift-v": "terminal.paste",
     "shift-insert": "terminal.paste",
     "ctrl-v": "terminal.paste_image"
+  },
+  "layout:apollo": {
+    "alt-n": "apollo-tabs.space",
+    "alt-shift-t": "apollo-tabs.terminal",
+    "alt-t": "apollo-tabs.terminal"
   }
 }

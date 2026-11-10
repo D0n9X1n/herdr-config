@@ -6,7 +6,8 @@
 
 | Key | Action |
 |---|---|
-| `cmd-shift-t` | new tab |
+| `cmd-t`, `cmd-shift-t` | new tab, named after its folder (`apollo-tabs.terminal`, Apollo layout only) |
+| `cmd-n` | new space, its first tab named after its folder (`apollo-tabs.space`, Apollo layout only) |
 | `cmd-w` | close pane (the last pane closes the tab) |
 | `cmd-left` / `cmd-right` | previous / next tab (also in the terminal) |
 | `cmd-shift-z` | zoom pane |
@@ -19,7 +20,7 @@
 | `cmd-[` | unbound (copy mode in SonicTerm) |
 | `cmd-9` | last tab (`apollo-tabs.last`) |
 
-Every other Herdr default stays. `cmd-n` stays "new space": Herdr has no new-window command.
+Every other Herdr default stays. The `cmd-t`, `cmd-shift-t` and `cmd-n` keys above sit in a `layout:apollo` section, so they name tabs only while the Apollo layout shows; in any other layout they are Herdr's own new tab and new space. `cmd-n` stays "new space": Herdr has no new-window command.
 
 ## Unbound SonicTerm actions
 
@@ -28,6 +29,7 @@ Herdr has no command for these, so they have no key: broadcast, pane resize, cop
 ## Commands you can bind
 
 - `apollo-tabs.last` selects the last tab of the space. `cmd-9` runs it.
+- `apollo-tabs.terminal` makes a terminal tab named after the focused folder, and `apollo-tabs.space` a space whose first tab is named the same way (see [Sidebar](Sidebar)).
 - `apollo-changes.next` selects the next file in the Changes panel and shows its diff. It wraps at the end. Bind it in `keys.json`, for example `"cmd-alt-n": "apollo-changes.next"` in `global`, or run `herdr-app do apollo-changes.next`.
 
 ## Windows
@@ -45,4 +47,4 @@ On Windows Herdr reads `cmd` as the Windows key, so `user/keys.json` doesn't fit
 | terminal `alt-backspace`, `alt-left`, `alt-right` | `ctrl-backspace`, `ctrl-left`, `ctrl-right` | Windows word keys |
 | `cmd-h`, `cmd-alt-h`, `cmd-q` | none | macOS only; Alt+F4 closes the window |
 
-It adds a few Windows keys: `alt-{`, `alt-}`, `alt-?` and `alt-shift-?` repeat their shifted spellings, and the terminal adds `ctrl-shift-c` and `ctrl-insert` (copy) and `ctrl-shift-f` (search). `alt-9` runs `apollo-tabs.last`. A test checks that every key in `user/keys.json` has its Windows key or is dropped on purpose, so the two keymaps change together.
+It adds a few Windows keys: `alt-{`, `alt-}`, `alt-?` and `alt-shift-?` repeat their shifted spellings, and the terminal adds `ctrl-shift-c` and `ctrl-insert` (copy) and `ctrl-shift-f` (search). `alt-9` runs `apollo-tabs.last`, and `alt-t`, `alt-shift-t` and `alt-n` run `apollo-tabs.terminal` and `apollo-tabs.space` in the Apollo layout. A test checks that every key in `user/keys.json` has its Windows key or is dropped on purpose, so the two keymaps change together.

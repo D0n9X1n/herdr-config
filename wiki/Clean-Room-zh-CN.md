@@ -16,7 +16,7 @@ Apollo 只用下面这些资料做成：
 ## 不允许
 
 - `~/.config/herdr-app/mods/` 或 `~/.config/herdr-app/layouts/` 下的任何内容，上面的数据文件除外。
-- 任何自带 mod 的代码。自带 mod（`files`、`menu`、`worktree`、`machine-add`）只按名称使用。
+- 任何自带 mod 的代码。自带 mod（`files`、`menu`、`worktree`）只按名称使用。
 
 ## 做法
 

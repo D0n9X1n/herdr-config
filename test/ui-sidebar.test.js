@@ -33,17 +33,17 @@ test("chrome brand controls stop the press so window_drag does not start", async
   assert.equal(m.ctx.stopped, before + 2);
 });
 
-test("chrome: search toggles apollo.sidebar.search; footer Settings and Add machine", async () => {
+test("chrome: search toggles apollo.sidebar.search; footer Settings, no Add machine", async () => {
   const brand = await loadMod(CHROME, { data: data(), size: { width: 300, height: 48 } });
   brand.click("search");
   assert.deepEqual(brand.rec.calls.filter((c) => c.fn === "setShared").map((c) => [c.name, c.args]), [["apollo.sidebar.search", true]]);
-  const footer = await loadMod(CHROME, { data: data(), props: { footer: true }, size: { width: 300, height: 130 } });
+  const footer = await loadMod(CHROME, { data: data(), props: { footer: true }, size: { width: 300, height: 96 } });
+  assert.ok(!footer.ids().includes("add-machine"));
   footer.click("settings");
-  footer.click("add-machine");
-  assert.deepEqual(runs(footer), [{ name: "app.settings", args: undefined }, { name: "mod.open", args: { name: "machine-add" } }]);
+  assert.deepEqual(runs(footer), [{ name: "app.settings", args: undefined }]);
 });
 
-test("spaces: clicks select a space, focus an agent, and start a new space with no args", async () => {
+test("spaces: clicks select a space, focus an agent, and start a new space whose first tab is named", async () => {
   const m = await loadMod(SPACES, { data: data(), size: { width: 256, height: 600 } });
   m.click("space-s2");
   m.click("agent-t7");
@@ -51,7 +51,7 @@ test("spaces: clicks select a space, focus an agent, and start a new space with 
   assert.deepEqual(runs(m), [
     { name: "space.select", args: { id: "s2" } },
     { name: "agent.focus", args: { terminal: "t7" } },
-    { name: "space.new", args: undefined },
+    { name: "space.new", args: { tab: "Terminal" } },
   ]);
 });
 
@@ -72,7 +72,7 @@ test("New space here, with a remote space active: devbox gets machine devbox, th
     ["apollo-spaces", "popup", { menu: "machine", machine: "devbox" }],
     ["apollo-spaces", "popup", { menu: "machine", machine: null }],
   ]);
-  const want = [{ machine: "devbox" }, { machine: "" }];
+  const want = [{ machine: "devbox", tab: "devbox" }, { machine: "", tab: "Terminal" }];
   for (const [i, spec] of specs.entries()) {
     const pop = await loadMod(SPACES, { data: d, props: { ...spec.props, overlay: `o${i}` } });
     pop.click("new-space-here");
@@ -233,4 +233,13 @@ test("chrome collapsed: the same logo, and no app name", async () => {
   assert.equal(imgs[0].calls.rounded, 5);
   assert.ok(!texts(m).includes("Apollo"));
   assert.ok(!texts(m).includes("Herdr"));
+});
+
+test("Windows: chrome footer and the spaces' New space work the same as on macOS", async () => {
+  const d = data({ data: { window: { platform: "windows", fullscreen: false, buttons: true } } });
+  const footer = await loadMod(CHROME, { data: d, props: { footer: true }, size: { width: 256, height: 96 } });
+  assert.deepEqual(footer.ids().filter((id) => ["settings", "add-machine", "account"].includes(id)), ["settings", "account"]);
+  const m = await loadMod(SPACES, { data: { ...d, focused: { space: "s1", tab: "b1", pane: "p1", cwd: "C:\\Users\\ann\\api" }, home: "C:\\Users\\ann" }, size: { width: 256, height: 600 } });
+  m.click("new-space");
+  assert.deepEqual(runs(m), [{ name: "space.new", args: { tab: "api" } }]);
 });

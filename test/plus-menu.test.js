@@ -83,11 +83,12 @@ for (const machine of [null, "devbox"]) {
     const id = space.id;
     const items = Object.fromEntries(findAll(plusMenu(KNOWN), (n) => n.kind === "item").map((n) => [n.attrs.id, n]));
     const r = recorder();
-    for (const k of ["terminal", "agent-claude", "new-space", "new-worktree", "open-worktree"]) pickPlus(items[k], space, r);
+    const panes = [{ pane: "x", tab: space.tabs[0].id, cwd: "/w/api", focused: true, program: null }];
+    for (const k of ["terminal", "agent-claude", "new-space", "new-worktree", "open-worktree"]) pickPlus(items[k], space, r, { panes, home: "/home/ann" });
     assert.deepEqual(r.calls.map(({ fn, name, args }) => ({ fn, name, args })), [
-      { fn: "run", name: "tab.new", args: { space: id } },
-      { fn: "run", name: "tab.new", args: { space: id, argv: ["claude"] } },
-      { fn: "run", name: "space.new", args: undefined },
+      { fn: "run", name: "tab.new", args: { space: id, name: "api" } },
+      { fn: "run", name: "tab.new", args: { space: id, name: "Claude Code", argv: ["claude"] } },
+      { fn: "run", name: "space.new", args: { tab: "api" } },
       { fn: "openOverlay", name: "worktree", args: { mod: "worktree", kind: "dialog", props: { space: id, action: "new" } } },
       { fn: "openOverlay", name: "worktree", args: { mod: "worktree", kind: "dialog", props: { space: id, action: "open" } } },
     ]);

@@ -23,5 +23,10 @@
   "terminal": {
     "cmd-left": "tab.prev",
     "cmd-right": "tab.next"
+  },
+  "layout:apollo": {
+    "cmd-t": "apollo-tabs.terminal",
+    "cmd-shift-t": "apollo-tabs.terminal",
+    "cmd-n": "apollo-tabs.space"
   }
 }

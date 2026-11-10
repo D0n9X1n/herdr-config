@@ -50,8 +50,8 @@ test("+ popup: hides uninstalled agents; every pick runs its command and closes 
   assert.deepEqual(m.rec.calls.filter((c) => c.fn === "knownAgents").map((c) => c.args), [{ on: null }]);
   for (const id of ["terminal", "agent-claude", "new-space", "new-worktree", "open-worktree"]) m.click(id);
   assert.deepEqual(runs(m), [
-    { name: "tab.new", args: { space: "s1" } }, { name: "tab.new", args: { space: "s1", argv: ["claude"] } },
-    { name: "space.new", args: undefined },
+    { name: "tab.new", args: { space: "s1", name: "w" } }, { name: "tab.new", args: { space: "s1", name: "Claude Code", argv: ["claude"] } },
+    { name: "space.new", args: { tab: "r" } },
   ]);
   assert.deepEqual(overlays(m), [
     { mod: "worktree", kind: "dialog", props: { space: "s1", action: "new" } },
@@ -108,7 +108,7 @@ test("specs: a row opens the viewer pane; Work on it starts the agent", async ()
   m.click("work-on-it");
   assert.deepEqual(runs(m), [
     { name: "pane.split", args: { direction: "right", mod: "apollo-specs", props: { file: "/r/docs/specs/pending/x.md", on: null } } },
-    { name: "tab.new", args: { space: "s1", folder: "/r", argv: ["claude"], task: "Work on the spec docs/specs/pending/x.md. Read it first." } },
+    { name: "tab.new", args: { space: "s1", name: "Claude Code", folder: "/r", argv: ["claude"], task: "Work on the spec docs/specs/pending/x.md. Read it first." } },
   ]);
 });
 
@@ -471,9 +471,10 @@ test("changes: the `next` command (apollo-changes.next) selects the next file an
 // ---- Defect 1: mods read props() (Herdr may pass nothing, or {}, to init) ----
 for (const ip of [undefined, {}]) {
   const tag = ip === undefined ? "init(undefined)" : "init({})";
-  test(`chrome footer from props() alone (${tag}): Settings, Add machine and the account render`, async () => {
-    const m = await loadMod("mods/apollo-chrome", { data: { settings: { zoom: 1 }, home: "/home/ann", agents: [] }, props: { footer: true }, initProps: ip, size: { width: 256, height: 130 } });
-    for (const id of ["settings", "add-machine", "account"]) assert.ok(m.ids().includes(id), id);
+  test(`chrome footer from props() alone (${tag}): Settings and the account render`, async () => {
+    const m = await loadMod("mods/apollo-chrome", { data: { settings: { zoom: 1 }, home: "/home/ann", agents: [] }, props: { footer: true }, initProps: ip, size: { width: 256, height: 96 } });
+    for (const id of ["settings", "account"]) assert.ok(m.ids().includes(id), id);
+    assert.ok(!m.ids().includes("add-machine"));
     assert.ok(!m.ids().includes("panel-close"), "not the brand");
   });
   test(`pane header from props() alone (${tag}) targets its own pane`, async () => {
@@ -496,7 +497,7 @@ for (const ip of [undefined, {}]) {
   test(`spaces machine popup from props() alone (${tag})`, async () => {
     const m = await loadMod("mods/apollo-spaces", { data: tabsData(), props: { menu: "machine", machine: "devbox", overlay: "o1" }, initProps: ip });
     m.click("new-space-here");
-    assert.deepEqual(runs(m), [{ name: "space.new", args: { machine: "devbox" } }]);
+    assert.deepEqual(runs(m), [{ name: "space.new", args: { machine: "devbox", tab: "devbox" } }]);
   });
 }
 

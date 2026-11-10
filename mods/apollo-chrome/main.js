@@ -3,7 +3,7 @@ import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { run, setShared, shared, settings as appSettings, window as herdrWindow, home, agents, theme, props as herdrProps } from "herdr";
 import {
-  collapse, expand, settings, addMachine, brandView, footerView, isCollapsed,
+  collapse, expand, settings, brandView, footerView, isCollapsed,
 } from "./lib.js";
 
 const FALLBACK = { foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", border: "#3c3836" };
@@ -53,11 +53,10 @@ export default class Chrome extends View {
   }
 
   footerEl(vm) {
-    const [settingsRow, machineRow, acct] = vm.children;
+    const [settingsRow, acct] = vm.children;
     const [avatar, name, count] = acct.children;
     return v_flex().size_full().border_t(1).border_color(col("border")).pt(8).px(8).pb(9).gap(2)
       .child(this.footerRow(settingsRow, settings))
-      .child(this.footerRow(machineRow, addMachine))
       .child(h_flex().id("account").h(40).mt(6).px(6).gap(8).items_center()
         .child(h_flex().size(28).rounded_full().bg(col("raised")).border(1).border_color(col("border"))
           .flex_none().items_center().justify_center()

@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 const root = new URL("../", import.meta.url).pathname;
 const svgs = () => readdirSync(join(root, "mods"), { recursive: true }).filter((p) => p.endsWith(".svg")).map((p) => join("mods", p));
-const A3 = ["plus", "plug", "gear", "search", "panel-close", "panel-open", "chevron", "branch", "pin"];
+const A3 = ["plus", "gear", "search", "panel-close", "panel-open", "chevron", "branch", "pin"];
 const MARKS = ["arc", "diamond", "check"];
 const BRANCH_MODS = ["apollo-spaces", "apollo-pane", "apollo-status"];
 const has = (mod, g) => existsSync(join(root, "mods", mod, `${g}.svg`));
@@ -29,7 +29,8 @@ test("each A3 glyph name exists exactly once across all mods (branch: one identi
 });
 
 test("glyphs sit where their mod uses them", () => {
-  for (const g of ["search", "panel-close", "panel-open", "gear", "plug"]) assert.ok(has("apollo-chrome", g), g);
+  for (const g of ["search", "panel-close", "panel-open", "gear"]) assert.ok(has("apollo-chrome", g), g);
+  assert.ok(!has("apollo-chrome", "plug"), "Add machine's plug glyph is gone");
   for (const g of ["plus", "chevron", "branch", "pin"]) assert.ok(has("apollo-spaces", g), g);
   for (const g of ["files", "changes", "specs", "more", "close"]) assert.ok(has("apollo-tabs", g), `tabs ${g}`);
   for (const g of ["split-right", "split-down", "zoom", "close"]) assert.ok(has("apollo-pane", g), `pane ${g}`);

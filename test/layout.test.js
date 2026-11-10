@@ -41,7 +41,7 @@ export function requirements(L) {
   want("spaces weight 1", same(spaces.size, { weight: 1 }));
   want("spaces mod", spaces.content?.mod === "apollo-spaces");
   const footer = n("footer");
-  want("footer 130 px", same(footer.size, { px: 130 }));
+  want("footer 96 px", same(footer.size, { px: 96 }));
   want("footer apollo-chrome props.footer", footer.content?.mod === "apollo-chrome" && footer.content?.props?.footer === true);
   const main = n("main");
   want("main is a column", main.type === "column");
@@ -99,7 +99,7 @@ const MUTATIONS = {
   "brand height": set("brand", (n) => { n.size.px = 47; }),
   "brand drag": set("brand", (n) => { n.window_drag = false; }),
   "spaces weight": set("spaces", (n) => { n.size = { weight: 2 }; }),
-  "footer height": set("footer", (n) => { n.size.px = 120; }),
+  "footer height": set("footer", (n) => { n.size.px = 130; }),
   "footer props": set("footer", (n) => { n.content.props.footer = false; }),
   "main orientation": set("main", (n) => { n.type = "row"; }),
   "main padding": set("main", (n) => { n.padding = 5; }),

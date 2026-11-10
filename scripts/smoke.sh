@@ -278,6 +278,17 @@ mods_section() {
   chk "focus unchanged on $focus" focused_is "$focus"
   chk "only the target is gone (panes as before the split)" test "$(tab_panes "$space" | LC_ALL=C sort)" = "$(printf '%s\n' "$before" | LC_ALL=C sort)"
 
+  # Naming: apollo-tabs.terminal (cmd-t / alt-t in the Apollo layout) makes a tab named after the focused
+  # folder ("repo"), not Herdr's number; the new tab is owned so rollback closes it.
+  tabs0=$(_live_ids)
+  herdr-app do apollo-tabs.terminal >/dev/null || fail "apollo-tabs.terminal"
+  sleep 1
+  newtab=$(_live_ids | grep -vxF -f <(printf '%s\n' "$tabs0") | sed -n 's/^tab //p' | head -1)
+  [ -n "$newtab" ] && live_own tab "$newtab"
+  chk "apollo-tabs.terminal made one new tab" test -n "$newtab"
+  chk "the new tab is named after the folder (repo), not a number" test \
+    "$(herdr-app ls | jq -r --arg t "$newtab" '.. | objects | select(.id? == $t) | .name')" = repo
+
   emit_do openSpec "$tmp/repo/docs/specs/pending/fixture.md" || fail "openSpec"
   specp=$(jq -r '.pane // empty' <<<"$EMIT_REPLY")
   chk "openSpec made a mod pane (pane id, no terminal)" bash -c '[ -n "$1" ] && [ -z "$(jq -r ".terminal // empty" <<<"$2")" ]' _ "$specp" "$EMIT_REPLY"

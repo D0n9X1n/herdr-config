@@ -47,9 +47,17 @@ const EXPECTED = {
       "cmd-9": "apollo-tabs.last",
     },
     terminal: { "cmd-left": "tab.prev", "cmd-right": "tab.next" },
+    // In the Apollo layout, new tabs and spaces go through apollo-tabs, which names them.
+    "layout:apollo": { "cmd-t": "apollo-tabs.terminal", "cmd-shift-t": "apollo-tabs.terminal", "cmd-n": "apollo-tabs.space" },
   },
   removed: { global: ["cmd-["] },
 };
+
+test("outside the Apollo layout, the global new-tab and new-space keys stay Herdr's", () => {
+  const keys = read("user/keys.json");
+  assert.equal(keys.global["cmd-t"], "tab.new");
+  assert.equal(keys.global["cmd-n"], "space.new");
+});
 
 test("diffKeys reports changed, added and removed keys per section", () => {
   const d = { global: { a: "x", b: "y" }, terminal: { c: "z" } };

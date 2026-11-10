@@ -85,7 +85,17 @@ export function workOnIt(spec, { space, repo, agents }, { run, notify }) {
   if (!a) {
     return notify({ title: "No agent installed", body: "Install Claude Code or another agent to work on a spec.", level: "warning" });
   }
-  return run("tab.new", { space: space.id, folder: repo, argv: a.run, task: `Work on the spec ${spec.path}. Read it first.` });
+  const name = uniqueName(a.name, (space.tabs ?? []).map((t) => t.name));
+  return run("tab.new", { space: space.id, name, folder: repo, argv: a.run, task: `Work on the spec ${spec.path}. Read it first.` });
+}
+
+// base, else "base 2", "base 3", ... : the first not taken. A copy of apollo-tabs' uniqueName: change them together.
+export function uniqueName(base, taken) {
+  const used = new Set(taken ?? []);
+  if (!used.has(base)) return base;
+  let n = 2;
+  while (used.has(`${base} ${n}`)) n += 1;
+  return `${base} ${n}`;
 }
 
 // The viewer pane: reads exactly props.file with props.on; the body is the markdown without frontmatter.

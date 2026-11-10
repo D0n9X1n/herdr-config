@@ -18,8 +18,8 @@ The list refreshes when files change, and every 10 s. `apollo-changes.next` move
 
 Specs lists the repo's `docs/specs/<status>/*.md` files by status: pending, paused, finished and canceled. The filter matches a title or a path. Click a spec to open it in a pane to the right.
 
-Work on it starts the first installed agent, Claude first, in a new tab, with the task "Work on the spec <path>. Read it first." It uses the selected spec only while that spec is shown; otherwise it uses the first one shown. With no agent installed, it shows a warning. The list refreshes on change and every 60 s.
+Work on it starts the first installed agent, Claude first, in a new tab named after the agent, with the task "Work on the spec <path>. Read it first." It uses the selected spec only while that spec is shown; otherwise it uses the first one shown. With no agent installed, it shows a warning. The list refreshes on change and every 60 s.
 
 ## The + menu
 
-The ⊕ button opens a 220 px menu under it, right-aligned to it: Terminal, Start an agent (installed agents only), New space, New worktree and Open worktree. Before the tab row has been measured, the menu opens at the pointer.
+The ⊕ button opens a 220 px menu under it, right-aligned to it: Terminal, Start an agent (installed agents only), New space, New worktree and Open worktree. Terminal, the agents and New space name the tab they make (see [Sidebar](Sidebar)). Before the tab row has been measured, the menu opens at the pointer.

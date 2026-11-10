@@ -2,8 +2,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { recorder } from "./helpers/stubs.js";
 import {
-  clamp, collapse, expand, settings, addMachine, account, SIZE_IS_ZOOMED, DEFAULT_PX,
+  clamp, collapse, expand, settings, account, SIZE_IS_ZOOMED, DEFAULT_PX,
 } from "../mods/apollo-chrome/lib.js";
+import * as chrome from "../mods/apollo-chrome/lib.js";
 
 const zoomCalls = (r) => r.calls.filter((c) => /^app\.zoom/.test(c.name ?? ""));
 
@@ -43,14 +44,11 @@ test("expand: 100 gives 256, 900 gives 480, nothing saved gives 256, 219 gives 2
   assert.deepEqual([100, 900, undefined, null, 219, 220].map(px), [256, 480, 256, 256, 256, 220]);
 });
 
-test("footer actions: Settings and Add machine", () => {
+test("footer action: Settings; Add machine is gone", () => {
   const r = recorder();
   settings(r);
-  addMachine(r);
-  assert.deepEqual(r.calls, [
-    { fn: "run", name: "app.settings", args: undefined },
-    { fn: "run", name: "mod.open", args: { name: "machine-add" } },
-  ]);
+  assert.deepEqual(r.calls, [{ fn: "run", name: "app.settings", args: undefined }]);
+  assert.equal(chrome.addMachine, undefined);
 });
 
 test("account shows the initial and basename of home()", () => {

@@ -55,3 +55,5 @@ herdr-app do layout.switch '{"name":"apollo"}'
 `herdr-app.exe` is a window app: PowerShell doesn't wait for it or show its output. Run the `herdr-app check` loop above from Git Bash.
 
 Apollo hides the system title bar, and on Windows Herdr then draws no window buttons. So `apollo-tabs` draws minimize, maximize and close at the right end of the tab row, wherever `window().buttons` is true (Windows and Linux). Maximize shows a restore icon while the window is maximized. macOS keeps its traffic lights and draws nothing new.
+
+When Herdr's terminals run as Administrator, every tab on this computer starts with a red shield. `apollo-tabs` asks herdr-core, which starts the terminals, with `hc exec whoami /groups` and looks for the High integrity SID `S-1-16-12288`. It asks again every 30 seconds, so a restarted core moves the mark. Tabs of a remote space never show it, and macOS and Linux never ask.

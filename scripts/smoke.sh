@@ -280,12 +280,16 @@ mods_section() {
 
   # Naming: apollo-tabs.terminal (cmd-t / alt-t in the Apollo layout) makes a tab named after the focused
   # folder ("repo"), not Herdr's number; the new tab is owned so rollback closes it.
-  tabs0=$(_live_ids)
+  # Only a tab that appeared in the fixture space counts, and only when exactly one did: rollback closes
+  # what is owned, so an ambiguous diff is never owned.
+  space_tabs() { herdr-app ls | jq -r --arg s "$space" '.spaces[] | select(.id == $s) | .tabs[].id' | LC_ALL=C sort; }
+  tabs0=$(space_tabs)
   herdr-app do apollo-tabs.terminal >/dev/null || fail "apollo-tabs.terminal"
   sleep 1
-  newtab=$(_live_ids | grep -vxF -f <(printf '%s\n' "$tabs0") | sed -n 's/^tab //p' | head -1)
-  [ -n "$newtab" ] && live_own tab "$newtab"
-  chk "apollo-tabs.terminal made one new tab" test -n "$newtab"
+  newtabs=$(space_tabs | grep -vxF -f <(printf '%s\n' "$tabs0") || true)
+  newtab=""
+  if [ "$(printf '%s' "$newtabs" | grep -c .)" -eq 1 ]; then newtab=$newtabs; live_own tab "$newtab"; fi
+  chk "apollo-tabs.terminal made exactly one new tab in the fixture space" test -n "$newtab"
   chk "the new tab is named after the folder (repo), not a number" test \
     "$(herdr-app ls | jq -r --arg t "$newtab" '.. | objects | select(.id? == $t) | .name')" = repo
 

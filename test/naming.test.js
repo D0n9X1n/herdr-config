@@ -10,16 +10,16 @@ const runs = (r) => r.calls.map(({ name, args }) => ({ name, args }));
 
 for (const [tag, fn] of [["apollo-tabs", folderName], ["apollo-spaces", spacesFolderName]]) {
   test(`folderName (${tag}): last folder, ~ at home, macOS and Windows paths`, () => {
-    assert.equal(fn("/Users/ann/Public/herdr-config", "/Users/ann"), "herdr-config");
-    assert.equal(fn("/Users/ann/api/", "/Users/ann"), "api");
-    assert.equal(fn("/Users/ann", "/Users/ann"), "~");
-    assert.equal(fn("/Users/ann/", "/Users/ann"), "~");
+    assert.equal(fn("/home/ann/Public/herdr-config", "/home/ann"), "herdr-config");
+    assert.equal(fn("/home/ann/api/", "/home/ann"), "api");
+    assert.equal(fn("/home/ann", "/home/ann"), "~");
+    assert.equal(fn("/home/ann/", "/home/ann"), "~");
     assert.equal(fn("C:\\Users\\ann\\api", "C:\\Users\\ann"), "api");
     assert.equal(fn("C:\\Users\\ann", "C:\\Users\\ann"), "~");
     assert.equal(fn("C:\\Users\\Ann", "c:\\users\\ann"), "~", "Windows paths match in any case");
-    assert.equal(fn("/", "/Users/ann"), null);
-    assert.equal(fn("", "/Users/ann"), null);
-    assert.equal(fn(null, "/Users/ann"), null);
+    assert.equal(fn("/", "/home/ann"), null);
+    assert.equal(fn("", "/home/ann"), null);
+    assert.equal(fn(null, "/home/ann"), null);
   });
 }
 
@@ -99,4 +99,13 @@ test("the New space button keeps Herdr's default machine and names the first tab
   newSpace(r, { cwd: "/w/api", home: "/home/ann" });
   newSpace(r, { cwd: "/home/ann", home: "/home/ann" });
   assert.deepEqual(runs(r), [{ name: "space.new", args: { tab: "api" } }, { name: "space.new", args: { tab: "~" } }]);
+});
+
+test("Work on it twice in a row: the second tab is numbered (tabs read when clicked)", () => {
+  const agent = { key: "claude", name: "Claude Code", installed: true, run: ["claude"] };
+  const space = { id: "s1", machine: null, tabs: [] };
+  const names = [];
+  const run = (_name, args) => { names.push(args.name); space.tabs.push({ id: `b${space.tabs.length}`, name: args.name }); };
+  for (let i = 0; i < 2; i++) workOnIt({ path: "docs/specs/pending/x.md" }, { space, repo: "/w/repo", agents: [agent] }, { run, notify() {} });
+  assert.deepEqual(names, ["Claude Code", "Claude Code 2"]);
 });

@@ -100,6 +100,17 @@ const specsExec = () => fakeExec({
   "find docs/specs -type f -name *.md": { code: 0, stdout: "docs/specs/pending/x.md\n", stderr: "" },
 });
 
+test("specs: a second Work on it sees the first tab (live tabs, not the followed snapshot)", async () => {
+  const d = tabsData();
+  const m = await loadMod("mods/apollo-specs", { data: d, exec: specsExec(), files: { "/r/docs/specs/pending/x.md": "# X spec\n" } });
+  await settle(m);
+  m.click("work-on-it");
+  // Herdr adds the tab; the space and folder stay, so the mod does not re-follow.
+  d.spaces = [{ ...d.spaces[0], tabs: [...d.spaces[0].tabs, { id: "b9", name: "Claude Code", named: true }] }];
+  m.click("work-on-it");
+  assert.deepEqual(runs(m).filter((r) => r.name === "tab.new").map((r) => r.args.name), ["Claude Code", "Claude Code 2"]);
+});
+
 test("specs: a row opens the viewer pane; Work on it starts the agent", async () => {
   const m = await loadMod("mods/apollo-specs", { data: tabsData(), exec: specsExec(), files: { "/r/docs/specs/pending/x.md": "# X spec\n" } });
   await settle(m);

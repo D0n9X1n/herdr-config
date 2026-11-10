@@ -131,7 +131,9 @@ export default class Specs extends View {
       .child(h_flex().id("work-on-it").h(30).px(10).items_center().justify_center().rounded(6).bg(col("accent"))
         .on_click(() => {
           const spec = workTarget(this.sel, shown);
-          if (spec && this.space) workOnIt(spec, { space: this.space, repo: this.repo, agents: this.agents }, { run, notify });
+          // The live space, not this.space: its tabs change without a re-follow (a second Work on it is "… 2").
+          const space = this.space && ((spaces() ?? []).find((s) => s.id === this.space.id) ?? this.space);
+          if (spec && space) workOnIt(spec, { space, repo: this.repo, agents: this.agents }, { run, notify });
         })
         .child(div().text_size(12).font_semibold().text_color(col("solid_foreground")).child("Work on it")));
   }

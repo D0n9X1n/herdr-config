@@ -56,3 +56,18 @@ test("account shows the initial and basename of home()", () => {
   assert.deepEqual(account("/home/bob/"), { initial: "B", name: "bob" });
   assert.deepEqual(account(""), { initial: "?", name: "" });
 });
+
+// footerEl: 1 px top line + pt 8 + Settings 32 + gap 2 + account mt 6 + 40 + pb 7 = the footer block.
+test("the footer block fits its rows exactly", async () => {
+  const { readFileSync } = await import("node:fs");
+  const src = readFileSync(new URL("../mods/apollo-chrome/main.js", import.meta.url), "utf8");
+  const px = (re) => Number(src.match(re)?.[1]);
+  const box = src.match(/footerEl\(vm\)[\s\S]*?v_flex\(\)\.size_full\(\)\.border_t\((\d+)\)[^\n]*\.pt\((\d+)\)[^\n]*\.pb\((\d+)\)\.gap\((\d+)\)/);
+  assert.ok(box, "footer container");
+  const [, border, pt, pb, gap] = box.map(Number);
+  const row = px(/footerRow\(row, action\) \{\s*return h_flex\(\)\.id\(row\.attrs\.id\)\.h\((\d+)\)/);
+  const acct = src.match(/h_flex\(\)\.id\("account"\)\.h\((\d+)\)\.mt\((\d+)\)/).slice(1).map(Number);
+  const layout = JSON.parse(readFileSync(new URL("../layouts/apollo.json", import.meta.url), "utf8"));
+  const find = (n) => n.id === "footer" ? n : (n.children ?? []).map(find).find(Boolean);
+  assert.equal(border + pt + row + gap + acct[1] + acct[0] + pb, find(layout).size.px);
+});

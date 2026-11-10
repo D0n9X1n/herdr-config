@@ -55,7 +55,7 @@ export default class Chrome extends View {
   footerEl(vm) {
     const [settingsRow, acct] = vm.children;
     const [avatar, name, count] = acct.children;
-    return v_flex().size_full().border_t(1).border_color(col("border")).pt(8).px(8).pb(9).gap(2)
+    return v_flex().size_full().border_t(1).border_color(col("border")).pt(8).px(8).pb(7).gap(2)
       .child(this.footerRow(settingsRow, settings))
       .child(h_flex().id("account").h(40).mt(6).px(6).gap(8).items_center()
         .child(h_flex().size(28).rounded_full().bg(col("raised")).border(1).border_color(col("border"))

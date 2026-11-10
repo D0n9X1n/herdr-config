@@ -8,7 +8,8 @@ const runs = (r) => r.calls.map(({ name, args }) => ({ name, args }));
 
 test("pills take the icon from the tab's agent pane, else its first pane", () => {
   const pills = tabPills(tabSpace(), tabPanes());
-  assert.deepEqual(pills.map((p) => [p.id, p.icon]), [["b1", "icons/claude.svg"], ["b2", "icons/nvim.svg"], ["b3", "icons/zsh.svg"]]);
+  assert.deepEqual(pills.map((p) => [p.id, p.icon]), [["b1", "mods/apollo-tabs/star.svg"], ["b2", "icons/nvim.svg"], ["b3", "icons/zsh.svg"]]);
+  assert.equal(pills[0].iconColor, "#d97757", "Claude Code is the orange star");
   assert.equal(pills[0].tint, true);
 });
 

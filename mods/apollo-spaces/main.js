@@ -60,7 +60,7 @@ export default class Spaces extends View {
 
   mark(n) {
     if (!n) return null;
-    const el = glyph(n.kind, 12, n.attrs.color).flex_none();
+    const el = glyph(n.kind, 14, n.attrs.color).flex_none();
     return n.attrs.spin ? el.spin(n.attrs.spin) : el;
   }
 
@@ -69,7 +69,7 @@ export default class Spaces extends View {
       .border(1).border_color(col("input")).track_focus(this.focus)
       .on_click(() => this.focus.focus())
       .on_key_down((e, cx) => { this.onKey(e); cx.notify(); })
-      .child(div().text_size(12).text_color(col(n.attrs.query ? "foreground" : "dim")).truncate()
+      .child(div().text_size(13).font_light().text_color(col(n.attrs.query ? "foreground" : "dim")).truncate()
         .child(n.attrs.query || "Filter spaces"));
   }
 
@@ -78,8 +78,8 @@ export default class Spaces extends View {
       .bg(col("raised")).border(1).border_color(col("border"))
       .hover((s) => s.border_color(col("input")))
       .on_click(() => newSpace({ run }, { cwd: focused()?.cwd, home: home() }))
-      .child(glyph("plus", 16, "foreground"))
-      .child(div().text_size(13).font_medium().text_color(col("foreground")).child("New space"));
+      .child(glyph("plus", 18, "foreground"))
+      .child(div().text_size(14).font_light().text_color(col("foreground")).child("New space"));
   }
 
   machine(n) {
@@ -90,13 +90,13 @@ export default class Spaces extends View {
       const foldGlyph = first.attrs.folded ? "chevron" : "chevron-down";
       const [name, cnt] = rest;
       return header
-        .child(h_flex().id(first.attrs.id).size(14).items_center().justify_center()
+        .child(h_flex().id(first.attrs.id).size(16).items_center().justify_center()
           .on_click((_e, cx) => { cx.stop_propagation(); this.toggleFold(foldKeys.machines, n.attrs.machine ?? "local"); cx.notify(); })
-          .child(glyph(foldGlyph, 12, "dim")))
-        .child(div().flex_1().text_size(12).font_semibold().text_color(col("dim")).truncate().child(name.attrs.text))
-        .child(div().text_size(11).text_color(col("dim")).child(cnt.attrs.text));
+          .child(glyph(foldGlyph, 14, "dim")))
+        .child(div().flex_1().text_size(13).font_normal().text_color(col("dim")).truncate().child(name.attrs.text))
+        .child(div().text_size(12).font_light().text_color(col("dim")).child(cnt.attrs.text));
     }
-    return header.child(div().text_size(11).font_semibold().text_color(col("dim")).truncate().child(first.attrs.text));
+    return header.child(div().text_size(12).font_normal().text_color(col("dim")).truncate().child(first.attrs.text));
   }
 
   row(r, space) {
@@ -110,21 +110,21 @@ export default class Spaces extends View {
       .on_mouse_down("right", () => spaceMenu(space, { openOverlay }));
     el = a.fill ? el.bg(col(a.fill)) : el.hover((s) => s.bg(col("raised")));
     if (by.chevron) {
-      el = el.child(h_flex().id(by.chevron.attrs.id).size(14).flex_none().items_center().justify_center()
+      el = el.child(h_flex().id(by.chevron.attrs.id).size(16).flex_none().items_center().justify_center()
         .on_click((_e, cx) => { cx.stop_propagation(); this.toggleFold(foldKeys.spaces, space.id); cx.notify(); })
-        .child(glyph(by.chevron.attrs.folded ? "chevron" : "chevron-down", 12, by.chevron.attrs.color)));
+        .child(glyph(by.chevron.attrs.folded ? "chevron" : "chevron-down", 14, by.chevron.attrs.color)));
     } else if (a.height === 44) {
-      el = el.child(div().w(14).flex_none()); // keeps tiles aligned when a space has no agents
+      el = el.child(div().w(16).flex_none()); // keeps tiles aligned when a space has no agents
     }
-    let t = h_flex().size(20).rounded(6).flex_none().items_center().justify_center().bg(col(tile.color));
+    let t = h_flex().size(22).rounded(6).flex_none().items_center().justify_center().bg(col(tile.color));
     if (tile.ring) t = t.border(tile.ring).border_color(col("solid_foreground"));
-    el = el.child(t.child(div().text_size(10.5).font_weight(800).text_color(col(tile.textColor)).child(tile.text)));
-    const name = div().text_size(13).font_semibold().text_color(col(by.name.attrs.color)).truncate().child(by.name.attrs.text);
+    el = el.child(t.child(glyph(tile.glyph, 14, tile.textColor)));
+    const name = div().text_size(14).font_normal().text_color(col(by.name.attrs.color)).truncate().child(by.name.attrs.text);
     el = el.child(by.branch
       ? v_flex().flex_1().min_w(0).child(name)
         .child(h_flex().gap(4).items_center()
-          .child(glyph("branch", 12, by.branch.attrs.color))
-          .child(div().text_size(12).text_color(col(by.branch.attrs.color)).truncate().child(by.branch.attrs.text)))
+          .child(glyph("branch", 14, by.branch.attrs.color))
+          .child(div().text_size(13).font_light().text_color(col(by.branch.attrs.color)).truncate().child(by.branch.attrs.text)))
       : v_flex().flex_1().min_w(0).child(name));
     const m = this.mark(markNode);
     return m ? el.child(m) : el;
@@ -135,9 +135,9 @@ export default class Spaces extends View {
     let el = h_flex().id(a.id).h(28).pl(10).pr(8).gap(6).items_center().rounded(6)
       .on_click(() => clickAgent(agent, { run }));
     el = a.focused ? el.bg(col("raised")) : el.hover((s) => s.bg(col("raised")));
-    if (a.icon) el = el.child((a.tint ? svg(a.icon).text_color(col(a.color)) : image(a.icon)).size(14).flex_none());
-    el = el.child(div().flex_1().text_size(12).text_color(col(a.color)).truncate().child(a.title));
-    for (const c of n.children) el = el.child(c.kind === "pin" ? glyph("pin", 10, "dim").flex_none() : this.mark(c));
+    if (a.icon) el = el.child((a.tint ? svg(a.icon).text_color(col(a.iconColor ?? a.color)) : image(a.icon)).size(14).flex_none());
+    el = el.child(div().flex_1().text_size(13).font_light().text_color(col(a.color)).truncate().child(a.title));
+    for (const c of n.children) el = el.child(c.kind === "pin" ? glyph("pin", 12, "dim").flex_none() : this.mark(c));
     return el;
   }
 
@@ -158,8 +158,8 @@ export default class Spaces extends View {
       h_flex().id("new-space-here").h(32).px(8).gap(8).items_center().rounded(6)
         .hover((s) => s.bg(col("raised")))
         .on_click(() => { newSpaceHere({ machine: p.machine ?? null }, { run }, { cwd: focused()?.cwd, home: home() }); closeOverlay(p.overlay); })
-        .child(glyph("plus", 16, "foreground"))
-        .child(div().text_size(13).text_color(col("foreground")).child("New space here")));
+        .child(glyph("plus", 18, "foreground"))
+        .child(div().text_size(14).font_light().text_color(col("foreground")).child("New space here")));
   }
 
   // Queues a git probe for each space Herdr gives no branch for, when its folder changed (no cx use here).

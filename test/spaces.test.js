@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { recorder } from "./helpers/stubs.js";
 import { sidebarSpaces, sidebarAgents } from "./fixtures/sidebar.js";
 import {
-  spaceColor, contrast, monogram, groupByMachine, showHeaders, urgency, foldKeys,
+  spaceColor, contrast, tileGlyph, groupByMachine, showHeaders, urgency, foldKeys,
   clickSpace, clickAgent, agentOrder, newSpaceHere, spaceMenu, machineMenu,
 } from "../mods/apollo-spaces/lib.js";
 
@@ -27,13 +27,6 @@ test("spaceColor is stable and always ansi4, ansi5 or ansi6", () => {
 test("contrast against #141617 is at least 4.5:1 (spec: 6.6:1) for every tile color", () => {
   assert.equal(Math.round(contrast("#ffffff", "#000000")), 21);
   for (const [name, c] of Object.entries(hex)) assert.ok(contrast(c, "#141617") >= 6.6, `${name} ${contrast(c, "#141617")}`);
-});
-
-test("monogram is the first two letters, uppercase", () => {
-  assert.equal(monogram("dot-configs"), "DO");
-  assert.equal(monogram("a-b"), "AB");
-  assert.equal(monogram("~"), "~");
-  assert.equal(monogram("été"), "ÉT");
 });
 
 test("groupByMachine puts this computer first, then remote machines by name", () => {
@@ -106,4 +99,12 @@ test("machineMenu opens this mod as a popup carrying the machine", () => {
   assert.equal(r.calls[0].args.kind, "popup");
   assert.deepEqual(r.calls[0].args.props, { menu: "machine", machine: "devbox" });
   assert.deepEqual(r.calls[1].args.props, { menu: "machine", machine: null });
+});
+
+test("tileGlyph: a remote machine is a server, home is a house, a git space a repo, else a folder", () => {
+  assert.equal(tileGlyph({ machine: "devbox", branch: "main", name: "api" }), "server");
+  assert.equal(tileGlyph({ machine: null, branch: null, name: "~" }), "home");
+  assert.equal(tileGlyph({ machine: null, branch: "main", name: "api" }), "repo");
+  assert.equal(tileGlyph({ machine: null, branch: null, name: "notes" }, { repo: true }), "repo", "probed repo, no Herdr branch");
+  assert.equal(tileGlyph({ machine: null, branch: null, name: "notes" }), "folder");
 });

@@ -4,7 +4,7 @@
 
 ## Spaces and agents
 
-Each space shows a two-letter tile, its name, its branch and one status mark. Under a space, each agent has a row with its icon, title and mark. A working agent shows a spinning arc, a blocked one a diamond, and a done one a check; an idle one shows nothing. A space shows its most urgent agent: blocked, then done, then working.
+Each space shows a tile, its name, its branch and one status mark. The tile is a small icon on the space's color: a server for another machine, a house for the home folder, a book for a git repo, and a folder otherwise. Under a space, each agent has a row with its icon, title and mark. Claude Code shows Apollo's own star in Claude orange, here, on tab pills and in pane headers; other programs keep Herdr's icon. A working agent shows a spinning arc, a blocked one a diamond, and a done one a check; an idle one shows nothing. A space shows its most urgent agent: blocked, then done, then working.
 
 Click a space to select it; right-click it for Herdr's space menu. Click an agent to focus it. Rest the pointer on a space for half a second to see its full name, also when the sidebar is collapsed.
 
@@ -43,4 +43,4 @@ The search button opens a filter at the top. Typing keeps the spaces whose name 
 
 - `SIZE_IS_ZOOMED` in `mods/apollo-spaces/lib.js` says the sidebar's reported width is design px. That is checked only at zoom 1. At other zooms, collapse and expand may pick the wrong width.
 - Every icon uses one line weight: 2 on the 24 grid, 3 for the status marks, and 2.4 for the Windows buttons. A new icon must follow it; `test/glyphs.test.js` checks it.
-- Mods don't share files, so `apollo-spaces`, `apollo-pane` and `apollo-status` each keep the same `branch.svg`. The status marks (`arc.svg`, `diamond.svg`, `check.svg`) are copied the same way. `folderName` is in both `apollo-tabs` and `apollo-spaces`, and `uniqueName` in both `apollo-tabs` and `apollo-specs`. Change all copies together.
+- Mods don't share files, so `apollo-spaces`, `apollo-pane` and `apollo-status` each keep the same `branch.svg`. The status marks (`arc.svg`, `diamond.svg`, `check.svg`) are copied the same way. `agentIcon` and `star.svg` are in `apollo-spaces`, `apollo-tabs` and `apollo-pane`; `folderName` is in both `apollo-tabs` and `apollo-spaces`, and `uniqueName` in both `apollo-tabs` and `apollo-specs`. Change all copies together.

@@ -28,7 +28,7 @@ test("paneActions target the header's own pane, never the focused one", () => {
 
 test("paneHeader: icon, title, folder badge, branch badge and mark", () => {
   assert.deepEqual(paneHeader("p2", PANES), {
-    pane: "p2", icon: "icons/claude.svg", tint: true, title: "Claude Code: fix login",
+    pane: "p2", icon: "mods/apollo-pane/star.svg", tint: true, iconColor: "#d97757", title: "Claude Code: fix login",
     folder: "docs", branch: "feat/v0.0.1", mark: { kind: "diamond", color: "blocked" }, focused: false,
   });
   const p1 = paneHeader("p1", PANES);

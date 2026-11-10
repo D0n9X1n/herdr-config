@@ -26,7 +26,7 @@ export default class Chrome extends View {
       .hover((s) => s.bg(col("raised")))
       .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
       .on_click(() => onClick())
-      .child(glyph(icon, 16, "dim"));
+      .child(glyph(icon, 18, "dim"));
   }
 
   brand(vm) {
@@ -48,8 +48,8 @@ export default class Chrome extends View {
     return h_flex().id(row.attrs.id).h(32).px(8).gap(8).items_center().rounded(6)
       .hover((s) => s.bg(col("raised")))
       .on_click(() => action(handlers))
-      .child(glyph(row.children[0].kind, 16, "dim"))
-      .child(div().text_size(13).text_color(col("muted")).truncate().child(row.attrs.label));
+      .child(glyph(row.children[0].kind, 18, "dim"))
+      .child(div().text_size(14).font_light().text_color(col("muted")).truncate().child(row.attrs.label));
   }
 
   footerEl(vm) {
@@ -60,10 +60,10 @@ export default class Chrome extends View {
       .child(h_flex().id("account").h(40).mt(6).px(6).gap(8).items_center()
         .child(h_flex().size(28).rounded_full().bg(col("raised")).border(1).border_color(col("border"))
           .flex_none().items_center().justify_center()
-          .child(div().text_size(12).text_color(col("foreground")).child(avatar.attrs.text)))
+          .child(div().text_size(13).font_light().text_color(col("foreground")).child(avatar.attrs.text)))
         .child(v_flex().flex_1().min_w(0)
-          .child(div().text_size(13).text_color(col("foreground")).truncate().child(name.attrs.text))
-          .when(!!count, (el) => el.child(div().text_size(11.5).text_color(col("dim")).child(count?.attrs.text ?? "")))));
+          .child(div().text_size(14).font_light().text_color(col("foreground")).truncate().child(name.attrs.text))
+          .when(!!count, (el) => el.child(div().text_size(12.5).font_light().text_color(col("dim")).child(count?.attrs.text ?? "")))));
   }
 
   render() {

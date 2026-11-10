@@ -153,3 +153,37 @@ test("Windows close is no larger than maximize, and every Windows button stays i
     assert.ok(b.x0 >= 0 && b.y0 >= 0 && b.x1 <= 24 && b.y1 <= 24, `${g} ${JSON.stringify(b)}`);
   }
 });
+
+test("space tiles have their kind glyphs; the new-tab button is a plain plus, not a circled one", () => {
+  for (const g of ["repo", "home", "server", "folder"]) assert.ok(has("apollo-spaces", g), g);
+  const plus = readFileSync(join(root, "mods/apollo-tabs/more.svg"), "utf8");
+  assert.doesNotMatch(plus, /<circle\b/, "no ring around the plus");
+});
+
+// Icons read larger: every glyph() call is at least 12 px, marks and the branch at least 14, the bar
+// icons at least 16. Windows caption buttons stay 10 px (they are drawn by svg() at their native size).
+test("glyph sizes: nothing under 12 px, marks and branch 14, bar icons 16 or more", () => {
+  const calls = [];
+  for (const f of readdirSync(join(root, "mods"), { recursive: true }).filter((p) => p.endsWith("main.js"))) {
+    const src = readFileSync(join(root, "mods", f), "utf8");
+    for (const m of src.matchAll(/\bglyph\(([^,]+),\s*(\d+)/g)) calls.push({ f, what: m[1].trim(), px: Number(m[2]) });
+  }
+  assert.ok(calls.length >= 15);
+  for (const c of calls) {
+    const want = /MARKS|mark|branch|admin|foldGlyph|chevron|n\.kind|tile\.glyph/.test(c.what) ? 14
+      : /"close"|"pin"/.test(c.what) ? 12 : 16;
+    assert.ok(c.px >= want, `${c.f}: glyph(${c.what}, ${c.px}) < ${want}`);
+  }
+});
+
+// Text reads clearer and lighter: no mod text under 12 px; weights light (300) or normal (400) only.
+test("mod text: every text_size is 12 px or more; every text is light or normal weight", () => {
+  for (const f of readdirSync(join(root, "mods"), { recursive: true }).filter((p) => p.endsWith("main.js"))) {
+    const src = readFileSync(join(root, "mods", f), "utf8");
+    for (const m of src.matchAll(/text_size\(([\d.]+)\)/g)) assert.ok(Number(m[1]) >= 12, `${f}: text_size(${m[1]})`);
+    assert.doesNotMatch(src, /font_semibold\(\)|font_bold\(\)|font_medium\(\)/, `${f}: medium, semibold or bold`);
+    // Each text sets its weight: light for body text, normal for names and headings.
+    for (const m of src.matchAll(/text_size\([\d.]+\)\.(\w+)\(/g)) assert.match(m[1], /^font_(light|normal)$/, `${f}: text_size(...).${m[1]}()`);
+    for (const m of src.matchAll(/font_weight\((\d+)\)/g)) assert.ok(Number(m[1]) <= 400, `${f}: font_weight(${m[1]})`);
+  }
+});

@@ -109,3 +109,17 @@ test("Work on it twice in a row: the second tab is numbered (tabs read when clic
   for (let i = 0; i < 2; i++) workOnIt({ path: "docs/specs/pending/x.md" }, { space, repo: "/w/repo", agents: [agent] }, { run, notify() {} });
   assert.deepEqual(names, ["Claude Code", "Claude Code 2"]);
 });
+
+// Claude Code shows Apollo's own star, in Claude orange, wherever its program icon shows. Other programs keep theirs.
+import { agentIcon as spacesIcon } from "../mods/apollo-spaces/lib.js";
+import { agentIcon as tabsIcon } from "../mods/apollo-tabs/lib.js";
+import { agentIcon as paneIcon } from "../mods/apollo-pane/lib.js";
+const CLAUDE = { key: "claude", name: "Claude Code", icon: "icons/claude.svg", tint: false, agent: true };
+const NVIM = { key: "nvim", name: "Neovim", icon: "icons/nvim.svg", tint: true, agent: false };
+for (const [mod, fn] of [["apollo-spaces", spacesIcon], ["apollo-tabs", tabsIcon], ["apollo-pane", paneIcon]]) {
+  test(`${mod}: Claude Code is the orange star; other programs keep Herdr's icon`, () => {
+    assert.deepEqual(fn(CLAUDE), { icon: `mods/${mod}/star.svg`, tint: true, color: "#d97757" });
+    assert.deepEqual(fn(NVIM), { icon: "icons/nvim.svg", tint: true, color: null });
+    assert.deepEqual(fn(null), { icon: null, tint: false, color: null });
+  });
+}

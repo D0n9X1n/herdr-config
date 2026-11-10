@@ -22,4 +22,4 @@ Specs 按状态列出仓库里的 `docs/specs/<status>/*.md` 文件：pending、
 
 ## + 菜单
 
-⊕ 按钮会在它下方打开一个 220 px 宽的菜单，并与它右对齐：Terminal、Start an agent（只列出已安装的 agent）、New space、New worktree 和 Open worktree。Terminal、agent 和 New space 会给它们创建的标签页命名（见[侧边栏](Sidebar-zh-CN)）。标签栏还没测量好之前，菜单会在鼠标指针处打开。
++ 按钮会在它下方打开一个 220 px 宽的菜单，并与它右对齐：Terminal、Start an agent（只列出已安装的 agent）、New space、New worktree 和 Open worktree。Terminal、agent 和 New space 会给它们创建的标签页命名（见[侧边栏](Sidebar-zh-CN)）。标签栏还没测量好之前，菜单会在鼠标指针处打开。鼠标所在的行会用浅色填充和边框高亮。

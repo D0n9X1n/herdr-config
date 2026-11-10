@@ -4,7 +4,7 @@
 
 ## 空间和 agent
 
-每个空间显示一个两个字母的图块、名称、分支和一个状态标记。空间下面每个 agent 有一行，显示图标、标题和标记。工作中的 agent 显示旋转的弧线，被阻塞的显示菱形，已完成的显示对勾，空闲的不显示。空间显示它最紧急的 agent：先是阻塞，然后是完成，然后是工作中。
+每个空间显示一个图块、名称、分支和一个状态标记。图块是空间颜色上的一个小图标：另一台机器显示服务器，主文件夹显示房子，git 仓库显示一本书，其他显示文件夹。空间下面每个 agent 有一行，显示图标、标题和标记。Claude Code 在这里、标签和窗格标题中都显示 Apollo 自己的星形图标，颜色为 Claude 橙色；其他程序保留 Herdr 的图标。工作中的 agent 显示旋转的弧线，被阻塞的显示菱形，已完成的显示对勾，空闲的不显示。空间显示它最紧急的 agent：先是阻塞，然后是完成，然后是工作中。
 
 单击空间选中它；右键单击打开 Herdr 的空间菜单。单击 agent 聚焦它。鼠标在空间上停半秒会显示它的完整名称，侧边栏收起时也一样。
 
@@ -43,4 +43,4 @@ Herdr 用编号称呼没人命名的标签页：1、2、3。Apollo 会给它创�
 
 - `mods/apollo-spaces/lib.js` 里的 `SIZE_IS_ZOOMED` 认为侧边栏报告的宽度是设计像素。这只在缩放为 1 时验证过。在其他缩放下，收起和展开可能选错宽度。
 - 所有图标使用同一种线宽：24 网格上为 2，状态标记为 3，Windows 按钮为 2.4。新图标也要遵守；`test/glyphs.test.js` 会检查。
-- mod 之间不能共享文件，所以 `apollo-spaces`、`apollo-pane` 和 `apollo-status` 各自保存同一个 `branch.svg`。状态标记（`arc.svg`、`diamond.svg`、`check.svg`）也是这样复制的。`folderName` 同时在 `apollo-tabs` 和 `apollo-spaces` 里，`uniqueName` 同时在 `apollo-tabs` 和 `apollo-specs` 里。修改时要一起改所有副本。
+- mod 之间不能共享文件，所以 `apollo-spaces`、`apollo-pane` 和 `apollo-status` 各自保存同一个 `branch.svg`。状态标记（`arc.svg`、`diamond.svg`、`check.svg`）也是这样复制的。`agentIcon` 和 `star.svg` 在 `apollo-spaces`、`apollo-tabs` 和 `apollo-pane` 里；`folderName` 同时在 `apollo-tabs` 和 `apollo-spaces` 里，`uniqueName` 同时在 `apollo-tabs` 和 `apollo-specs` 里。修改时要一起改所有副本。

@@ -98,14 +98,15 @@ test("collapsed view: one plus; names kept; no branch, agent, chevron or machine
   assert.ok(rows.filter((r) => r !== active[0]).every((r) => r.attrs.fill === null));
 });
 
-test("active row: text, branch and marks use solid_foreground; tile shows color and monogram", () => {
+test("active row: text, branch and marks use solid_foreground; tile shows color and a kind glyph", () => {
   const v = view();
   const row = byKind(v, "row").find((r) => r.attrs.active);
   assert.equal(byKind(row, "name")[0].attrs.color, "solid_foreground");
   assert.equal(byKind(row, "branch")[0].attrs.color, "solid_foreground");
   assert.equal(byKind(row, "diamond")[0].attrs.color, "solid_foreground");
   const tile = byKind(row, "tile")[0];
-  assert.equal(tile.attrs.text, "DO");
+  assert.equal(tile.attrs.glyph, "repo", "a git space shows the repo glyph");
+  assert.equal(tile.attrs.text, undefined, "no two-letter monogram");
   assert.ok(["ansi4", "ansi5", "ansi6"].includes(tile.attrs.color));
   const other = byKind(v, "row").find((r) => r.attrs.id === "space-s2");
   assert.equal(byKind(other, "name")[0].attrs.color, "foreground");

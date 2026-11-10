@@ -128,21 +128,21 @@ export default class Changes extends View {
       .on_click((_e, cx) => this.select(f, cx));
     el = on ? el.bg(col("selected")) : el.hover((s) => s.bg(col("raised")));
     return el
-      .child(div().w(12).flex_none().text_size(11).font_semibold().text_color(col(MARK_COLOR[f.mark])).child(f.mark))
-      .child(div().flex_1().min_w(0).text_size(12).text_color(col("foreground")).truncate().child(f.path))
-      .child(div().text_size(11).text_color(col("done")).child(`+${f.added}`))
-      .child(div().text_size(11).text_color(col("blocked")).child(`-${f.removed}`));
+      .child(div().w(12).flex_none().text_size(12).font_normal().text_color(col(MARK_COLOR[f.mark])).child(f.mark))
+      .child(div().flex_1().min_w(0).text_size(13).font_light().text_color(col("foreground")).truncate().child(f.path))
+      .child(div().text_size(12).font_light().text_color(col("done")).child(`+${f.added}`))
+      .child(div().text_size(12).font_light().text_color(col("blocked")).child(`-${f.removed}`));
   }
 
   diffRow(r, i) {
     let el = h_flex().id(`diff-row-${i}`).px(6).gap(6).items_center();
     if (r.bg) el = el.bg(col(r.bg));
-    if (r.kind === "label") return el.pt(6).child(div().text_size(11).font_semibold().text_color(col("muted")).child(r.text));
-    if (r.kind === "hunk" || r.kind === "limit") return el.child(div().text_size(11).text_color(col("dim")).truncate().child(r.text));
+    if (r.kind === "label") return el.pt(6).child(div().text_size(12).font_normal().text_color(col("muted")).child(r.text));
+    if (r.kind === "hunk" || r.kind === "limit") return el.child(div().text_size(12).font_light().text_color(col("dim")).truncate().child(r.text));
     return el
-      .child(div().w(28).flex_none().text_size(11).text_color(col(r.numColor)).child(r.old == null ? "" : String(r.old)))
-      .child(div().w(28).flex_none().text_size(11).text_color(col(r.numColor)).child(r.new == null ? "" : String(r.new)))
-      .child(div().flex_1().min_w(0).text_size(12).text_color(col("foreground")).truncate().child(r.text));
+      .child(div().w(28).flex_none().text_size(12).font_light().text_color(col(r.numColor)).child(r.old == null ? "" : String(r.old)))
+      .child(div().w(28).flex_none().text_size(12).font_light().text_color(col(r.numColor)).child(r.new == null ? "" : String(r.new)))
+      .child(div().flex_1().min_w(0).text_size(13).font_light().text_color(col("foreground")).truncate().child(r.text));
   }
 
   render() {
@@ -150,11 +150,11 @@ export default class Changes extends View {
     const files = this.state?.files ?? [];
     const head = this.repo ? `${files.length} changed${this.state?.truncated ? " (first 1000)" : ""}` : "No repository";
     return v_flex().id("root").size_full().p(8).gap(6)
-      .child(div().text_size(12).font_semibold().text_color(col("muted")).child(this.error ? `git: ${this.error}` : head))
+      .child(div().text_size(13).font_normal().text_color(col("muted")).child(this.error ? `git: ${this.error}` : head))
       .child(v_flex().id("files").flex_none().h(fileListHeight(files.length)).gap(1).overflow_y_scrollbar().children(files.map((f) => this.fileRow(f))))
       .child(div().h(1).bg(col("border")).flex_none())
       .when(!!this.sel, (el) => el.child(h_flex().id("diff-header").h(24).flex_none().items_center()
-        .child(div().text_size(12).font_semibold().text_color(col("foreground")).truncate().child(this.sel ?? ""))))
+        .child(div().text_size(13).font_normal().text_color(col("foreground")).truncate().child(this.sel ?? ""))))
       .child(v_flex().id("diff").flex_1().min_h(0).min_w(0).overflow_y_scrollbar()
         .children(this.rows.map((r, i) => this.diffRow(r, i + 1))));
   }

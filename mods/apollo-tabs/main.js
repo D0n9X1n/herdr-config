@@ -4,11 +4,12 @@ import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import {
   spaces, panes, run, openOverlay, closeOverlay, nextCommand, knownAgents, layout, readTextFile, appHome, theme,
-  props as herdrProps, window as herdrWindow,
+  props as herdrProps, window as herdrWindow, hc,
 } from "herdr";
 import {
   activeSpace, tabPills, selectTab, closeTab, onWheel, handleCommand, loadAgents, plusMenu, pickPlus,
   panelState, loadPanelState, panelClick, plusAnchor, PLUS_MENU_W, windowButtons, WIN_BUTTON_W,
+  checkElevation, showAdmin, ADMIN_EVERY,
 } from "./lib.js";
 
 const FALLBACK = {
@@ -34,6 +35,16 @@ export default class Tabs extends View {
       cx.spawn(async (cx) => { this.agents = await loadAgents(space, knownAgents); cx.notify(); });
       return;
     }
+    // Windows: is herdr-core (and so every local terminal) elevated? Never asked elsewhere.
+    this.admin = "unknown";
+    if (herdrWindow()?.platform === "windows") {
+      const check = async (cx) => {
+        const state = await checkElevation(hc);
+        if (state !== this.admin) { this.admin = state; cx.notify(); }
+      };
+      cx.spawn(check);
+      cx.timer.every(ADMIN_EVERY, check);
+    }
     cx.spawn(async (cx) => {
       for (;;) {
         const c = await nextCommand();
@@ -52,11 +63,13 @@ export default class Tabs extends View {
     openOverlay({ mod: "apollo-tabs", kind: "popup", width: PLUS_MENU_W, ...(at ? { at } : {}), props: { menu: "plus", space: sp.id } });
   }
 
-  pill(p) {
+  pill(p, admin) {
     let el = h_flex().id(`tab-${p.id}`).h(28).px(10).gap(6).items_center().rounded(6).flex_none()
       .on_mouse_down("left", stop)
       .on_click(() => selectTab(p, { run }));
     el = p.active ? el.bg(col("selected")) : el.hover((s) => s.bg(col("raised")));
+    // First, so it is never read as the trailing red "blocked" status mark.
+    if (admin) el = el.child(glyph("admin", 12, "blocked").flex_none());
     if (p.icon) el = el.child((p.tint ? svg(p.icon).text_color(col("muted")) : image(p.icon)).size(14).flex_none());
     el = el.child(div().text_size(12).text_color(col(p.active ? "foreground" : "muted")).truncate().child(p.label));
     if (MARKS[p.status]) {
@@ -138,7 +151,7 @@ export default class Tabs extends View {
           const d = e.delta_lines?.y ?? e.delta?.y ?? 0;
           onWheel(Math.sign(d), { run });
         })
-        .children(tabPills(sp, panes()).map((p) => this.pill(p))))
+        .children(tabPills(sp, panes()).map((p) => this.pill(p, showAdmin(this.admin, sp)))))
       .child(h_flex().id("plus").size(28).rounded(6).flex_none().items_center().justify_center()
         .hover((s) => s.bg(col("raised")))
         .on_mouse_down("left", stop)

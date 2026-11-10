@@ -55,3 +55,5 @@ herdr-app do layout.switch '{"name":"apollo"}'
 `herdr-app.exe` 是窗口程序：PowerShell 不会等它结束，也不显示它的输出。请在 Git Bash 里运行上面的 `herdr-app check` 循环。
 
 Apollo 隐藏了系统标题栏，这时 Herdr 在 Windows 上不画窗口按钮。所以只要 `window().buttons` 为真（Windows 和 Linux），`apollo-tabs` 就在标签栏右端画出最小化、最大化和关闭按钮。窗口最大化时，最大化按钮显示还原图标。macOS 保留红绿灯按钮，不多画任何东西。
+
+当 Herdr 的终端以管理员身份运行时，这台电脑上的每个标签页前面都会出现一个红色盾牌。`apollo-tabs` 通过 `hc exec whoami /groups` 询问启动这些终端的 herdr-core，并查找高完整性级别的 SID `S-1-16-12288`。它每 30 秒再问一次，所以 core 重启后标记也会跟着变化。远程空间的标签页从不显示它，macOS 和 Linux 也从不询问。

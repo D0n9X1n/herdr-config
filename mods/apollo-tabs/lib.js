@@ -149,3 +149,30 @@ export function windowButtons(win) {
     { id: "close", icon: "win-close", command: "window.close", danger: true },
   ];
 }
+
+// ---- Windows: admin mark ----
+// herdr-core starts every terminal, so its token is the one the tabs' shells get (an elevated window
+// can attach to a core that is not). `hc exec` runs `whoami /groups` inside the core; the integrity
+// label's SID is the same in every language. A failed check is "unknown" and draws nothing.
+
+export const ADMIN_CHECK = ["exec", "--timeout", "5", "whoami", "/groups"];
+export const ADMIN_EVERY = 30000; // re-check, so a restarted core moves the mark both ways
+
+export function elevation(groups) {
+  const sids = String(groups ?? "").match(/\bS-1-16-\d+\b/g) ?? [];
+  if (sids.some((s) => s === "S-1-16-12288" || s === "S-1-16-16384")) return "elevated";
+  if (sids.some((s) => s === "S-1-16-8192" || s === "S-1-16-4096")) return "normal";
+  return "unknown";
+}
+
+export async function checkElevation(hc) {
+  try {
+    const r = await hc(ADMIN_CHECK);
+    return r?.code === 0 ? elevation(r.stdout) : "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
+// Remote spaces' terminals run on another machine, under another core.
+export const showAdmin = (state, space) => state === "elevated" && !!space && space.machine == null;

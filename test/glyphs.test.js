@@ -112,16 +112,22 @@ test("copies of a glyph are byte-identical across mods", () => {
   for (const [name, list] of by) for (const [p, src] of list) assert.equal(src, list[0][1], `${p} differs from ${list[0][0]} (${name})`);
 });
 
-// Ink bounds of an M/L/l path (absolute and relative), widened by half the stroke.
+// Ink bounds of a path of M/L/H/V moves (absolute or relative) and rects, widened by half the stroke.
+// Any other command throws, so a check can never pass on geometry it skipped.
 function inkBox(svg) {
   const half = strokeOf(svg) / 2;
   let x = 0, y = 0;
   const xs = [], ys = [];
-  for (const [, cmd, args] of svg.matchAll(/([MLml])\s*([-\d.\s,]+)/g)) {
-    const n = args.trim().split(/[\s,]+/).map(Number);
-    for (let i = 0; i < n.length; i += 2) {
-      if (cmd === cmd.toLowerCase()) { x += n[i]; y += n[i + 1]; } else { x = n[i]; y = n[i + 1]; }
-      xs.push(x); ys.push(y);
+  for (const [, d] of svg.matchAll(/<path[^>]*\sd="([^"]*)"/g)) {
+    for (const [, cmd, args] of d.matchAll(/([A-Za-z])([^A-Za-z]*)/g)) {
+      if (!/[MLHVmlhv]/.test(cmd)) throw new Error(`inkBox: unsupported path command ${cmd}`);
+      const n = args.trim() ? args.trim().split(/[\s,]+/).map(Number) : [];
+      const rel = cmd === cmd.toLowerCase(), c = cmd.toUpperCase();
+      if (c === "H") for (const v of n) { x = rel ? x + v : v; xs.push(x); ys.push(y); }
+      else if (c === "V") for (const v of n) { y = rel ? y + v : v; xs.push(x); ys.push(y); }
+      else for (let i = 0; i < n.length; i += 2) {
+        x = rel ? x + n[i] : n[i]; y = rel ? y + n[i + 1] : n[i + 1]; xs.push(x); ys.push(y);
+      }
     }
   }
   for (const [, rx, ry, rw, rh] of svg.matchAll(/<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)) {
@@ -130,9 +136,12 @@ function inkBox(svg) {
   return { x0: Math.min(...xs) - half, y0: Math.min(...ys) - half, x1: Math.max(...xs) + half, y1: Math.max(...ys) + half };
 }
 
-test("inkBox reads relative steps: an oversized close would be caught", () => {
-  const big = '<svg viewBox="0 0 24 24" stroke-width="2.4"><path d="M4.8 4.8l19.2 19.2"/></svg>';
-  assert.equal(inkBox(big).x1, 24 + 1.2);
+test("inkBox reads every step: oversized close, minimize and restore are caught; unknown commands throw", () => {
+  const box = (d) => inkBox(`<svg viewBox="0 0 24 24" stroke-width="2.4"><path d="${d}"/></svg>`);
+  assert.equal(box("M4.8 4.8l19.2 19.2").x1, 24 + 1.2, "close, relative l");
+  assert.equal(box("M3.6 13.2h30").x1, 33.6 + 1.2, "minimize, relative h");
+  assert.equal(box("M8.4 8.4V3.6h30v30h-4.8").y1, 33.6 + 1.2, "restore, V/h/v");
+  assert.throws(() => box("M4 4C1 1 2 2 3 3"), /unsupported path command C/);
 });
 
 test("Windows close is no larger than maximize, and every Windows button stays inside the 24 grid", () => {

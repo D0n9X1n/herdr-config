@@ -11,7 +11,7 @@ function sidebar(collapsed, { platform = "macos", fullscreen = false } = {}) {
     kind: "sidebar", attrs: {}, children: [
       brandView({ collapsed, platform, fullscreen }),
       spacesView({ spaces: sidebarSpaces(), agents, collapsed }),
-      footerView({ collapsed, home: "/home/ann", agentCount: agents.length }),
+      footerView({ collapsed }),
     ],
   };
 }
@@ -32,8 +32,8 @@ test("expanded: one plus; app icon at x 84 on macOS (20 px, radius 5); no wordma
     assert.equal(count(sp, "name"), 1);
     assert.equal(count(sp, "branch"), 1);
   }
-  assert.ok(texts(s).includes("3 agents"));
-  assert.ok(texts(s).includes("ann"));
+  assert.ok(!texts(s).some((t) => /agents$/.test(t)), "no agent count in the footer");
+  assert.ok(!texts(s).includes("ann"), "no user name");
 });
 
 test("app icon x is 12 in fullscreen and off macOS", () => {
@@ -51,17 +51,18 @@ test("collapsed: one plus; every space named; brand holds the app icon and panel
   assert.deepEqual(findAll(brand, (n) => n.kind === "app-icon")[0].attrs, { src: "mods/apollo-chrome/logo.png", x: 84, size: 20, radius: 5 });
   for (const k of ["wordmark", "search", "panel-close", "agent-count", "branch", "agent"]) assert.equal(count(s, k), 0, k);
   assert.ok(!texts(s).some((t) => /agents$/.test(t)));
-  assert.ok(texts(s).includes("ann"));
+  assert.ok(!texts(s).includes("ann"), "no user name");
 });
 
-test("footer: the settings row with its gear and the account, no Add machine, both states", () => {
+test("footer: only the settings row with its gear; no account, user name or Add machine, both states", () => {
   for (const collapsed of [false, true]) {
     const f = sidebar(collapsed).children[2];
-    assert.deepEqual(findAll(f, (n) => n.attrs?.id).map((n) => n.attrs.id), ["settings", "account"]);
+    assert.deepEqual(findAll(f, (n) => n.attrs?.id).map((n) => n.attrs.id), ["settings"]);
     assert.equal(count(f, "gear"), 1);
     assert.equal(count(f, "plug"), 0);
+    assert.equal(count(f, "avatar"), 0);
     assert.ok(!texts(f).includes("Add machine"));
-    assert.equal(findAll(f, (n) => n.kind === "avatar")[0].attrs.text, "A");
+    assert.ok(!texts(f).includes("ann"));
   }
 });
 
@@ -71,6 +72,6 @@ test("Windows: the app icon sits at x 12 (no traffic lights); footer and spaces 
     assert.equal(findAll(win, (n) => n.kind === "app-icon")[0].attrs.x, 12);
     assert.deepEqual(win.children[1], mac.children[1], "spaces");
     assert.deepEqual(win.children[2], mac.children[2], "footer");
-    assert.deepEqual(findAll(win.children[2], (n) => n.attrs?.id).map((n) => n.attrs.id), ["settings", "account"]);
+    assert.deepEqual(findAll(win.children[2], (n) => n.attrs?.id).map((n) => n.attrs.id), ["settings"]);
   }
 });

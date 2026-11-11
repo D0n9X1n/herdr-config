@@ -1,7 +1,7 @@
 // apollo-chrome: brand block (sidebar top) and footer (props.footer). Logic lives in lib.js.
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
-import { run, setShared, shared, settings as appSettings, window as herdrWindow, home, agents, theme, props as herdrProps } from "herdr";
+import { run, setShared, shared, settings as appSettings, window as herdrWindow, theme, props as herdrProps } from "herdr";
 import {
   collapse, expand, settings, brandView, footerView, isCollapsed,
 } from "./lib.js";
@@ -53,24 +53,16 @@ export default class Chrome extends View {
   }
 
   footerEl(vm) {
-    const [settingsRow, acct] = vm.children;
-    const [avatar, name, count] = acct.children;
+    const [settingsRow] = vm.children;
     return v_flex().size_full().border_t(1).border_color(col("border")).pt(8).px(8).pb(7).gap(2)
-      .child(this.footerRow(settingsRow, settings))
-      .child(h_flex().id("account").h(40).mt(6).px(6).gap(8).items_center()
-        .child(h_flex().size(28).rounded_full().bg(col("raised")).border(1).border_color(col("border"))
-          .flex_none().items_center().justify_center()
-          .child(div().text_size(13).font_light().text_color(col("foreground")).child(avatar.attrs.text)))
-        .child(v_flex().flex_1().min_w(0)
-          .child(div().text_size(14).font_light().text_color(col("foreground")).truncate().child(name.attrs.text))
-          .when(!!count, (el) => el.child(div().text_size(12.5).font_light().text_color(col("dim")).child(count?.attrs.text ?? "")))));
+      .child(this.footerRow(settingsRow, settings));
   }
 
   render() {
     const collapsed = isCollapsed(this.width);
     const win = herdrWindow() ?? {};
     const body = this.footer
-      ? this.footerEl(footerView({ collapsed, home: home(), agentCount: (agents() ?? []).length }))
+      ? this.footerEl(footerView({ collapsed }))
       : this.brand(brandView({ collapsed, platform: win.platform, fullscreen: !!win.fullscreen }));
     return div().id("root").size_full()
       .on_size_change((size, cx) => { if (size.width !== this.width) { this.width = size.width; cx.notify(); } })

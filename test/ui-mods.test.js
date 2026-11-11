@@ -482,9 +482,10 @@ test("changes: the `next` command (apollo-changes.next) selects the next file an
 // ---- Defect 1: mods read props() (Herdr may pass nothing, or {}, to init) ----
 for (const ip of [undefined, {}]) {
   const tag = ip === undefined ? "init(undefined)" : "init({})";
-  test(`chrome footer from props() alone (${tag}): Settings and the account render`, async () => {
-    const m = await loadMod("mods/apollo-chrome", { data: { settings: { zoom: 1 }, home: "/home/ann", agents: [] }, props: { footer: true }, initProps: ip, size: { width: 256, height: 96 } });
-    for (const id of ["settings", "account"]) assert.ok(m.ids().includes(id), id);
+  test(`chrome footer from props() alone (${tag}): only Settings renders`, async () => {
+    const m = await loadMod("mods/apollo-chrome", { data: { settings: { zoom: 1 }, home: "/home/ann", agents: [] }, props: { footer: true }, initProps: ip, size: { width: 256, height: 48 } });
+    assert.ok(m.ids().includes("settings"));
+    assert.ok(!m.ids().includes("account"), "no account row");
     assert.ok(!m.ids().includes("add-machine"));
     assert.ok(!m.ids().includes("panel-close"), "not the brand");
   });

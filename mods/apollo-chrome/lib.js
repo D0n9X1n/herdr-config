@@ -31,11 +31,6 @@ export function expand({ saved }, { run }) {
 
 export const settings = ({ run }) => run("app.settings");
 
-export function account(home) {
-  const name = String(home ?? "").replace(/\/+$/, "").split("/").pop() ?? "";
-  return { initial: name ? [...name][0].toUpperCase() : "?", name };
-}
-
 const node = (kind, attrs = {}, children = []) => ({ kind, attrs, children });
 
 // Brand row (48 px, window_drag). Both states show only the Apollo logo (assets/logo/apollo.svg at 64 px),
@@ -51,15 +46,9 @@ export function brandView({ collapsed, platform = "macos", fullscreen = false })
   ]);
 }
 
-// Footer: Settings, then the account row ("N agents" only when expanded).
-export function footerView({ collapsed, home, agentCount = 0 }) {
-  const acct = account(home);
+// Footer: the Settings row only. No account row, so the user name is never shown.
+export function footerView({ collapsed }) {
   return node("footer", { collapsed }, [
     node("footer-row", { id: "settings", label: "Settings" }, [node("gear", { color: "dim" })]),
-    node("account", { id: "account" }, [
-      node("avatar", { text: acct.initial }),
-      node("account-name", { text: acct.name, color: "foreground" }),
-      ...(collapsed ? [] : [node("agent-count", { text: `${agentCount} agent${agentCount === 1 ? "" : "s"}`, color: "dim" })]),
-    ]),
   ]);
 }

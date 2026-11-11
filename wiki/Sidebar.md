@@ -21,7 +21,7 @@ This covers New space, New space here, the + menu, Work on it, and the new-tab a
 
 ## Footer
 
-The footer has the Settings row and the account row; it is 96 px tall. To add a machine, run `hc machine add <host>` in a terminal.
+The footer has only the Settings row; it does not show the user name. It is 48 px tall. To add a machine, run `hc machine add <host>` in a terminal.
 
 ## Folds
 

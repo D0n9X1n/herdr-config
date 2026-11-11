@@ -48,7 +48,7 @@
           "id": "footer",
           "type": "block",
           "size": {
-            "px": 96
+            "px": 48
           },
           "content": {
             "mod": "apollo-chrome",

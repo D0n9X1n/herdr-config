@@ -6,8 +6,8 @@
 
 An original Herdr layout with Apollo colors and a SonicTerm-aligned macOS keymap.
 
-[![CI](https://github.com/D0n9X1n/herdr-config/actions/workflows/ci.yml/badge.svg)](https://github.com/D0n9X1n/herdr-config/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/github/v/tag/D0n9X1n/herdr-config?sort=semver&label=version)](https://github.com/D0n9X1n/herdr-config/tags)
+[![CI](https://github.com/MOSconfig/herdr-config/actions/workflows/ci.yml/badge.svg)](https://github.com/MOSconfig/herdr-config/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/github/v/tag/MOSconfig/herdr-config?sort=semver&label=version)](https://github.com/MOSconfig/herdr-config/tags)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [Documentation](wiki/Home.md) · [简体中文文档](wiki/Home-zh-CN.md)

@@ -6,8 +6,8 @@
 
 | Key | Action |
 |---|---|
-| `cmd-t`, `cmd-shift-t` | new tab, unnamed so it follows the naming rule (`apollo-tabs.terminal`, Apollo layout only) |
-| `cmd-n` | new space, unnamed so it follows the naming rule (`apollo-tabs.space`, Apollo layout only) |
+| `cmd-t`, `cmd-shift-t` | new tab, unnamed so its title follows the folder (`apollo-tabs.terminal`, Apollo layout only) |
+| `cmd-n` | new space, unnamed so it follows the folder (`apollo-tabs.space`, Apollo layout only) |
 | `cmd-w` | close pane (the last pane closes the tab) |
 | `cmd-left` / `cmd-right` | previous / next tab (also in the terminal) |
 | `cmd-shift-z` | zoom pane |
@@ -29,7 +29,7 @@ Herdr has no command for these, so they have no key: broadcast, pane resize, cop
 ## Commands you can bind
 
 - `apollo-tabs.last` selects the last tab of the space. `cmd-9` runs it.
-- `apollo-tabs.terminal` makes an unnamed terminal tab and `apollo-tabs.space` an unnamed space, so both follow the naming rule (see [Sidebar](Sidebar)).
+- `apollo-tabs.terminal` makes an unnamed terminal tab and `apollo-tabs.space` an unnamed space, so both follow the folder (see [Sidebar](Sidebar)).
 - `apollo-changes.next` selects the next file in the Changes panel and shows its diff. It wraps at the end. Bind it in `keys.json`, for example `"cmd-alt-n": "apollo-changes.next"` in `global`, or run `herdr-app do apollo-changes.next`.
 
 ## Windows

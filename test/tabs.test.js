@@ -13,16 +13,16 @@ test("pills take the icon from the tab's agent pane, else its first pane", () =>
   assert.equal(pills[0].tint, true);
 });
 
-test("a numbered tab shows its program name, a shell the space's name; a named tab keeps its name", () => {
+test("every title ends with the tab's position; a renamed tab keeps its name, others show the space's folder", () => {
   const pills = tabPills(tabSpace(), tabPanes());
-  assert.deepEqual(pills.map((p) => p.label), ["Claude Code", "fix login", "dot-configs"]);
+  assert.deepEqual(pills.map((p) => p.label), ["w #1", "fix login #2", "w #3"]);
 });
 
-test("pills carry active and status; a tab with no panes falls back to its own name", () => {
+test("pills carry active and status; a tab with no panes still shows the space's folder and its position", () => {
   const pills = tabPills(tabSpace(4), tabPanes());
   assert.deepEqual(pills.map((p) => p.active), [true, false, false, false]);
   assert.equal(pills[0].status, "working");
-  assert.deepEqual([pills[3].label, pills[3].icon], ["4", null]);
+  assert.deepEqual([pills[3].label, pills[3].icon], ["w #4", null]);
   assert.deepEqual(tabPills(null, tabPanes()), []);
 });
 

@@ -10,14 +10,11 @@ Click a space to select it; right-click it for Herdr's space menu. Click an agen
 
 ## Names
 
-Herdr calls a tab nobody named by its number: 1, 2, 3. Apollo's tab row shows such a tab by the naming rule instead:
+- A space you did not rename shows the folder it is in now: the folder of its active tab's focused terminal, such as `api`; the home folder is `~`. It follows every `cd`.
+- A tab's title is the name you gave it, else the space's name. Every title ends with the tab's position: `api #1`, `api #2`, `notes #3`.
+- The number is the key that goes there: `alt-2` on Windows and `cmd-2` on macOS select `#2`. Closing a tab renumbers the ones after it.
 
-- A tab running an agent or another program shows its name, such as `Claude Code`.
-- A terminal tab shows the space's name, such as `Terminal Profile`, and follows it when the space's name changes.
-- A name already shown in the row gets a number: `Terminal Profile 2`.
-- A tab you renamed keeps your name; the rule no longer applies to it.
-
-New space, New space here, the + menu and the new-tab and new-space keys (see [Keys](Keys)) leave the tabs and spaces they make unnamed, so they follow the rule. A new space starts in the focused folder, so Herdr calls it after the same repo or folder as the current space; if you renamed the current space, the new space gets that name too. Work on it names its tab after the agent. Rename a tab with Herdr's rename; an empty name hands it back to the rule.
+New space, New space here, the + menu and the new-tab and new-space keys (see [Keys](Keys)) make unnamed spaces and tabs, so they follow the folder. A space or tab you renamed keeps your name; rename it to an empty name to follow the folder again. Work on it names its tab after the agent.
 
 ## Footer
 

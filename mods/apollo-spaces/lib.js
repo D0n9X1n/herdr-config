@@ -74,19 +74,38 @@ export function agentOrder(spaces, agents, _viewState = {}) {
   return spaces.flatMap((s) => (by.get(s.id) ?? []).map((a) => a.address));
 }
 
-// A new space is unnamed, so Herdr names it after its repo or folder and its tabs follow apollo-tabs' naming
-// rule; when someone renamed the current space, the new one gets that name too. A copy of apollo-tabs'
-// newSpaceArgs: change them together.
-export const newSpaceArgs = (current) => (current?.named && current.name ? { name: current.name } : {});
-
+// New spaces are unnamed, so the row shows the folder they are in (see spaceLabel).
 // The New space button: Herdr's default machine (the focused space's).
-export const newSpace = ({ run }, { current = null } = {}) => run("space.new", newSpaceArgs(current));
+export const newSpace = ({ run }) => run("space.new", {});
 
-// "" targets this computer explicitly, which matters while a remote space is active. The current space's
-// name carries over only to a new space on the same machine.
-export function newSpaceHere(group, { run }, { current = null } = {}) {
-  const same = current && (current.machine ?? null) === (group.machine ?? null);
-  return run("space.new", { machine: group.machine ?? "", ...newSpaceArgs(same ? current : null) });
+// "" targets this computer explicitly, which matters while a remote space is active.
+export const newSpaceHere = (group, { run }) => run("space.new", { machine: group.machine ?? "" });
+
+// Copies of apollo-tabs' folderName and spaceLabel (mods don't share files): change them together.
+// The last folder of a path ("/" or "\\"), "~" at home (any case on Windows); null for none or the root.
+export function folderName(cwd, home = "") {
+  const trim = (s) => String(s ?? "").replace(/[\\/]+$/, "");
+  const path = trim(cwd);
+  if (!path) return null;
+  const win = /^[a-z]:|\\/i.test(path);
+  const h = trim(home);
+  if (h && (win ? path.toLowerCase() === h.toLowerCase() : path === h)) return "~";
+  return path.split(/[\\/]/).pop() || null;
+}
+
+// A space's shown name: the name someone gave it; else the folder it is in now: its active tab's focused
+// terminal, else that tab's first terminal with a folder, else any of its terminals; with no terminal
+// folder known, Herdr's name. It follows each `cd`.
+export function spaceLabel(space, panes, home = "") {
+  if (!space) return "";
+  if (space.named) return space.name;
+  const tabs = space.tabs ?? [];
+  const ids = new Set(tabs.map((t) => t.id));
+  const own = (panes ?? []).filter((p) => ids.has(p.tab) && p.cwd);
+  const activeTab = (tabs.find((t) => t.active) ?? tabs[0])?.id;
+  const here = own.filter((p) => p.tab === activeTab);
+  const pane = here.find((p) => p.focused) ?? here[0] ?? own[0] ?? null;
+  return folderName(pane?.cwd, home) || space.name;
 }
 
 export const spaceMenu = (space, { openOverlay }) =>
@@ -206,7 +225,9 @@ export function spaceCwd(space, panes) {
 }
 
 // The spaces block as a view-model tree. main.js maps each node kind to gpui-kit elements.
-export function spacesView({ spaces, agents = [], collapsed = false, folded = {}, machinesFolded = {}, query = "", searchOpen = false, git = {} }) {
+export function spacesView({ spaces, agents = [], collapsed = false, folded = {}, machinesFolded = {}, query = "", searchOpen = false, git = {}, panes = null, home = "" }) {
+  // Rows, search and the home tile use each space's shown name (the folder it is in now, see spaceLabel).
+  if (panes) spaces = spaces.map((s) => ({ ...s, name: spaceLabel(s, panes, home) }));
   const searching = searchOpen && !collapsed;
   // While a query is active, folds are ignored so every match shows.
   const filtering = searching && String(query ?? "").trim() !== "";

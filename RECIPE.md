@@ -46,8 +46,8 @@ Left to right:
 - **Theme** `themes/apollo.json`: terminal colors from the Apollo palette; panel colors `chrome`/`canvas` `#141617`, `surface`/`popover` `#1d2021`, `raised`/`hover` `#1c1f20`, `selected`/`border` `#3c3836`, `input` `#504945`, `foreground` `#cfbc97`, `muted` `#d5c4a1`, `dim`/`idle` `#928374`, `accent`/`working`/`solid` `#fabd2f`, `solid_foreground` `#141617`, `blocked` `#fb4934`, `done` `#b8bb26`.
 - **Mods** (each self-contained; logic in `lib.js`, view in `main.js`):
   - `apollo-chrome`: brand row and footer. Calls `app.settings`, `home()`.
-  - `apollo-spaces`: spaces and agents. Calls `space.select`, `agent.focus`, `space.new` (unnamed, or with the current space's name when someone renamed it), `layout.resize`, `setAgentOrder`; runs `git` for branch names.
-  - `apollo-tabs`: tab row, panel buttons and the + menu (as its own popup, `props.menu: "plus"`). Calls `tab.select`, `tab.close`, `tab.next`, `tab.prev`, `tab.new` and `space.new` (unnamed, so the naming rule applies), `layout.show`, `layout.hide`, `layout.select`, `openOverlay`; opens the shipped `worktree` mod. Key commands `last`, `terminal`, `space`.
+  - `apollo-spaces`: spaces and agents. Calls `space.select`, `agent.focus`, `space.new` (unnamed, so the row follows the folder), `layout.resize`, `setAgentOrder`; runs `git` for branch names.
+  - `apollo-tabs`: tab row, panel buttons and the + menu (as its own popup, `props.menu: "plus"`). Calls `tab.select`, `tab.close`, `tab.next`, `tab.prev`, `tab.new` and `space.new` (unnamed; tab titles are the space's folder or the given name, then `#position`), `layout.show`, `layout.hide`, `layout.select`, `openOverlay`; opens the shipped `worktree` mod. Key commands `last`, `terminal`, `space`.
   - `apollo-pane`: the pane header. Calls `pane.split`, `pane.zoom`, `pane.close` with its own `props().pane`.
   - `apollo-changes`: runs `git status` and `git diff` (with `--no-optional-locks`, and `{on}` for remote spaces). Key command `next`.
   - `apollo-specs`: lists `docs/specs/*/*.md` with `find` and `readTextFile`; as a pane (`props: {file, on}`) it renders one spec. Calls `pane.split`, `tab.new`, `notify`.

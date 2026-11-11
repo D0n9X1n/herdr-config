@@ -6,8 +6,8 @@
 
 | 按键 | 动作 |
 |---|---|
-| `cmd-t`、`cmd-shift-t` | 新建标签页，不命名，所以遵循命名规则（`apollo-tabs.terminal`，只在 Apollo 布局中） |
-| `cmd-n` | 新建空间，不命名，所以遵循命名规则（`apollo-tabs.space`，只在 Apollo 布局中） |
+| `cmd-t`、`cmd-shift-t` | 新建标签页，不命名，所以标题跟随文件夹（`apollo-tabs.terminal`，只在 Apollo 布局中） |
+| `cmd-n` | 新建空间，不命名，所以跟随文件夹（`apollo-tabs.space`，只在 Apollo 布局中） |
 | `cmd-w` | 关闭窗格（最后一个窗格会关闭标签页） |
 | `cmd-left` / `cmd-right` | 上一个 / 下一个标签页（终端里也一样） |
 | `cmd-shift-z` | 放大窗格 |
@@ -29,7 +29,7 @@ Herdr 没有这些动作的命令，所以它们没有快捷键：广播输入�
 ## 可以绑定的命令
 
 - `apollo-tabs.last` 选中当前空间的最后一个标签页。`cmd-9` 运行它。
-- `apollo-tabs.terminal` 新建一个不命名的终端标签页，`apollo-tabs.space` 新建一个不命名的空间，两者都遵循命名规则（见[侧边栏](Sidebar-zh-CN)）。
+- `apollo-tabs.terminal` 新建一个不命名的终端标签页，`apollo-tabs.space` 新建一个不命名的空间，两者都跟随文件夹（见[侧边栏](Sidebar-zh-CN)）。
 - `apollo-changes.next` 在 Changes 面板中选中下一个文件并显示它的 diff，到末尾后回到开头。可以在 `keys.json` 里绑定，例如在 `global` 里写 `"cmd-alt-n": "apollo-changes.next"`，也可以运行 `herdr-app do apollo-changes.next`。
 
 ## Windows

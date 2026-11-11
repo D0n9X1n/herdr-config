@@ -5,7 +5,7 @@ import { spaces, focused, exec, watchFolder, theme, nextCommand } from "herdr";
 import { loadChanges, loadDiffGroups, diffRowsGrouped, findRepo, nextFile, fileListHeight } from "./lib.js";
 import { startRefresh, refreshFollower, CHANGES_EVERY } from "./refresh.js";
 
-const FALLBACK = { foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", selected: "#3c3836",
+const FALLBACK = { foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", hover: "#32302f", selected: "#3c3836",
   border: "#3c3836", done: "#b8bb26", blocked: "#fb4934" };
 const col = (name) => theme()?.[name] ?? FALLBACK[name] ?? name;
 const MARK_COLOR = { A: "done", U: "done", D: "blocked", M: "muted" };
@@ -126,7 +126,7 @@ export default class Changes extends View {
     const on = f.path === this.sel;
     let el = h_flex().id(`file-${f.path}`).h(26).px(8).gap(8).items_center().rounded(6)
       .on_click((_e, cx) => this.select(f, cx));
-    el = on ? el.bg(col("selected")) : el.hover((s) => s.bg(col("raised")));
+    el = on ? el.bg(col("selected")) : el.hover((s) => s.bg(col("hover")));
     return el
       .child(div().w(12).flex_none().text_size(12).font_normal().text_color(col(MARK_COLOR[f.mark])).child(f.mark))
       .child(div().flex_1().min_w(0).text_size(13).font_light().text_color(col("foreground")).truncate().child(f.path))

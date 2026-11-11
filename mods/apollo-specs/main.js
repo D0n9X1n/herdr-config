@@ -7,7 +7,7 @@ import {
 import { specsRepo, listSpecs, specCounts, filterSpecs, openSpec, workOnIt, workTarget, viewerModel, STATUSES } from "./lib.js";
 import { startRefresh, refreshFollower, SPECS_EVERY } from "./refresh.js";
 
-const FALLBACK = { foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", selected: "#3c3836",
+const FALLBACK = { foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", hover: "#32302f", selected: "#3c3836",
   border: "#3c3836", input: "#504945", accent: "#fabd2f", solid_foreground: "#141617" };
 const col = (name) => theme()?.[name] ?? FALLBACK[name] ?? name;
 const rowId = (s) => `spec-${s.path.split("/").slice(2).join("/")}`;
@@ -111,14 +111,14 @@ export default class Specs extends View {
       let el = h_flex().id(`status-${s}`).h(24).px(8).gap(4).items_center().rounded(6)
         .on_click((_e, cx) => { this.status = s; cx.notify(); })
         .child(div().text_size(13).font_light().text_color(col(s === this.status ? "foreground" : "muted")).child(`${s} ${counts[s]}`));
-      return s === this.status ? el.bg(col("selected")) : el.hover((x) => x.bg(col("raised")));
+      return s === this.status ? el.bg(col("selected")) : el.hover((x) => x.bg(col("hover")));
     };
     const row = (s) => {
       let el = h_flex().id(rowId(s)).h(28).px(8).gap(8).items_center().rounded(6)
         .on_click(() => { this.sel = s.path; openSpec(s, this.on, { run }); })
         .child(div().flex_1().min_w(0).text_size(13).font_light().text_color(col("foreground")).truncate().child(s.title))
         .child(div().text_size(12).font_light().text_color(col("dim")).child(s.priority ?? ""));
-      return this.sel === s.path ? el.bg(col("selected")) : el.hover((x) => x.bg(col("raised")));
+      return this.sel === s.path ? el.bg(col("selected")) : el.hover((x) => x.bg(col("hover")));
     };
     return v_flex().id("root").size_full().p(8).gap(6)
       .child(h_flex().gap(2).children(STATUSES.map(tab)))

@@ -55,11 +55,136 @@ test("spaces: clicks select a space, focus an agent, and start an unnamed new sp
   ]);
 });
 
-test("spaces: right-click a space opens the shipped menu for it (P7)", async () => {
+test("spaces: right-click a space opens this mod's space menu for it, at the pointer", async () => {
   const m = await loadMod(SPACES, { data: data(), size: { width: 256, height: 600 } });
   m.rightClick("space-s2");
-  assert.deepEqual(m.rec.calls.filter((c) => c.fn === "openOverlay").map((c) => c.args),
-    [{ mod: "menu", kind: "popup", props: { tab: "space", target: { space: "s2" } } }]);
+  const specs = m.rec.calls.filter((c) => c.fn === "openOverlay").map((c) => c.args);
+  assert.equal(specs.length, 1);
+  assert.deepEqual([specs[0].mod, specs[0].kind, specs[0].width, specs[0].at], ["apollo-spaces", "popup", 220, undefined]);
+  assert.deepEqual(specs[0].props, { menu: "space", space: "s2", repo: true });
+  assert.equal(typeof specs[0].height, "number");
+});
+
+// ---- The space menu popup: one selection shared by pointer and keys ----
+const MENU_THEME = { popover: "#1d2021", selected: "#3c3836", input: "#504945", blocked: "#fb4934", chrome: "#141617",
+  foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374" };
+const spaceMenuMod = (over = {}) => loadMod(SPACES, { data: { ...data(), theme: MENU_THEME, ...over.data },
+  props: { menu: "space", space: "s1", overlay: "o1", repo: true, ...over.props } });
+const elById = (m, id) => findEl(m, id)?.__el;
+const lit = (m) => m.ids().filter((id) => id.startsWith("menu-") && elById(m, id).calls.some((c) => c.name === "bg"));
+const acts = (m) => m.rec.calls.filter((c) => ["run", "openOverlay", "closeOverlay"].includes(c.fn)).map(({ fn, name, args }) => [fn, name, args]);
+
+test("space menu: opens with nothing highlighted and its own handle focused; rows use no .hover()", async () => {
+  const m = await spaceMenuMod();
+  assert.deepEqual(lit(m), []);
+  assert.equal(m.ctx.focused, true, "the popup takes the keyboard when it opens");
+  for (const id of m.ids().filter((x) => x.startsWith("menu-"))) {
+    assert.ok(!elById(m, id).calls.some((c) => c.name === "hover"), `${id} has no .hover()`);
+  }
+});
+
+test("space menu: hovering Rename, then Close space…, leaves exactly one highlighted row: Close", async () => {
+  const m = await spaceMenuMod();
+  m.hover("menu-rename");
+  assert.deepEqual(lit(m), ["menu-rename"]);
+  m.hover("menu-close");
+  assert.deepEqual(lit(m), ["menu-close"]);
+  const close = elById(m, "menu-close").calls;
+  assert.ok(close.some((c) => c.name === "bg" && c.args[0] === MENU_THEME.blocked), "Close highlights in blocked");
+  m.hover("space-menu", false);
+  assert.deepEqual(lit(m), [], "leaving the menu clears the highlight");
+});
+
+test("space menu: a highlighted row has the selected fill and an input border; every row keeps a 1 px popover border", async () => {
+  const m = await spaceMenuMod();
+  m.hover("menu-new-tab");
+  const calls = elById(m, "menu-new-tab").calls;
+  assert.ok(calls.some((c) => c.name === "bg" && c.args[0] === MENU_THEME.selected));
+  assert.ok(calls.some((c) => c.name === "border_color" && c.args[0] === MENU_THEME.input));
+  const other = elById(m, "menu-rename").calls;
+  assert.ok(other.some((c) => c.name === "border" && c.args[0] === 1));
+  assert.ok(other.some((c) => c.name === "border_color" && c.args[0] === MENU_THEME.popover));
+});
+
+test("space menu: ↓ from none is Rename, ↑ from none Close; both wrap; disabled Move up is skipped", async () => {
+  const m = await spaceMenuMod();
+  m.key("space-menu", "down");
+  assert.deepEqual(lit(m), ["menu-rename"]);
+  m.key("space-menu", "up");
+  assert.deepEqual(lit(m), ["menu-close"], "↑ wraps from the first row to the last");
+  m.key("space-menu", "down");
+  assert.deepEqual(lit(m), ["menu-rename"], "↓ wraps from the last row to the first");
+  const n = await spaceMenuMod();
+  n.key("space-menu", "up");
+  n.key("space-menu", "up");
+  n.key("space-menu", "up");
+  assert.deepEqual(lit(n), ["menu-open-worktree"], "s1 is first: Move up is disabled and skipped");
+  n.hover("menu-move-up");
+  assert.deepEqual(lit(n), [], "a disabled row never highlights");
+});
+
+test("space menu: pointer and keys share one selection", async () => {
+  const m = await spaceMenuMod();
+  m.hover("menu-new-tab");
+  m.key("space-menu", "down");
+  assert.deepEqual(lit(m), ["menu-new-worktree"], "↓ moves on from the hovered row");
+  m.hover("menu-rename");
+  assert.deepEqual(lit(m), ["menu-rename"], "the pointer moves the same selection");
+});
+
+test("space menu: Enter on Rename and a click on Close space… close the menu first, then run", async () => {
+  const m = await spaceMenuMod();
+  m.key("space-menu", "down");
+  m.key("space-menu", "enter");
+  assert.deepEqual(acts(m), [["closeOverlay", "o1", undefined], ["run", "space.rename", { id: "s1" }]]);
+  const c = await spaceMenuMod();
+  c.click("menu-close");
+  assert.deepEqual(acts(c), [["closeOverlay", "o1", undefined], ["run", "space.close", { id: "s1" }]]);
+  const d = await spaceMenuMod();
+  assert.throws(() => d.click("menu-move-up"), /no click handler/, "disabled rows are not clickable");
+});
+
+test("space menu keys: Escape closes without running; Space runs the selected row after closing", async () => {
+  const m = await spaceMenuMod();
+  m.key("space-menu", "escape");
+  assert.deepEqual(acts(m), [["closeOverlay", "o1", undefined]], "Escape only closes");
+  const n = await spaceMenuMod();
+  n.key("space-menu", "space");
+  assert.deepEqual(acts(n), [], "Space with nothing selected does nothing");
+  n.key("space-menu", "down");
+  n.key("space-menu", "space");
+  assert.deepEqual(acts(n), [["closeOverlay", "o1", undefined], ["run", "space.rename", { id: "s1" }]]);
+});
+
+test("space menu keys: Home and End go to the first and last enabled rows", async () => {
+  const m = await spaceMenuMod();
+  m.key("space-menu", "end");
+  assert.deepEqual(lit(m), ["menu-close"]);
+  m.key("space-menu", "home");
+  assert.deepEqual(lit(m), ["menu-rename"]);
+});
+
+test("space menu keys: a first letter jumps to the next enabled row starting with it, cycling; Ctrl+letter is ignored", async () => {
+  const m = await spaceMenuMod();
+  m.key("space-menu", "n");
+  assert.deepEqual(lit(m), ["menu-new-tab"]);
+  m.key("space-menu", "n");
+  assert.deepEqual(lit(m), ["menu-new-worktree"]);
+  m.key("space-menu", "n");
+  assert.deepEqual(lit(m), ["menu-new-tab"], "cycles among the rows starting with N");
+  m.key("space-menu", "m");
+  assert.deepEqual(lit(m), ["menu-move-down"], "Move up is disabled (s1 is first) and skipped");
+  m.key("space-menu", "c", { modifiers: { control: true } });
+  assert.deepEqual(lit(m), ["menu-move-down"], "Ctrl+C does not move the selection");
+  m.key("space-menu", "c");
+  assert.deepEqual(lit(m), ["menu-close"]);
+  m.key("space-menu", "enter");
+  assert.deepEqual(acts(m), [["closeOverlay", "o1", undefined], ["run", "space.close", { id: "s1" }]], "close first, then run");
+});
+
+test("space menu: a space that no longer exists closes the menu", async () => {
+  const m = await spaceMenuMod({ props: { space: "gone" } });
+  assert.deepEqual(acts(m).filter(([fn]) => fn === "closeOverlay"), [["closeOverlay", "o1", undefined]]);
 });
 
 test("New space here, with a remote space active: devbox gets machine devbox, this computer gets \"\"", async () => {

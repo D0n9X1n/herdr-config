@@ -5,7 +5,7 @@ import { recorder } from "./helpers/stubs.js";
 import { sidebarSpaces, sidebarAgents } from "./fixtures/sidebar.js";
 import {
   spaceColor, contrast, tileGlyph, groupByMachine, showHeaders, urgency, foldKeys,
-  clickSpace, clickAgent, agentOrder, newSpaceHere, spaceMenu, machineMenu,
+  clickSpace, clickAgent, agentOrder, newSpaceHere, machineMenu,
 } from "../mods/apollo-spaces/lib.js";
 
 const theme = JSON.parse(readFileSync(new URL("../themes/apollo.json", import.meta.url), "utf8"));
@@ -82,12 +82,6 @@ test("New space here targets this computer with machine \"\" and a remote by nam
     { fn: "run", name: "space.new", args: { machine: "" } },
     { fn: "run", name: "space.new", args: { machine: "devbox" } },
   ]);
-});
-
-test("spaceMenu opens the shipped menu as a space popup (P7)", () => {
-  const r = recorder();
-  spaceMenu(sidebarSpaces()[1], r);
-  assert.deepEqual(r.calls, [{ fn: "openOverlay", name: "menu", args: { mod: "menu", kind: "popup", props: { tab: "space", target: { space: "s2" } } } }]);
 });
 
 test("machineMenu opens this mod as a popup carrying the machine", () => {

@@ -1,19 +1,19 @@
-// apollo-spaces: the spaces block (and its own "New space here" popup). Logic lives in lib.js.
+// apollo-spaces: the spaces block (and its own popups: "New space here" and the space menu). Logic lives in lib.js.
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import {
   spaces, agents, panes, exec, run, openOverlay, closeOverlay, setAgentOrder, shared, setShared, settings, theme, layout,
-  props as herdrProps, home,
+  props as herdrProps, home, window as herdrWindow,
 } from "herdr";
 import {
   spacesView, agentOrder, guardWidth, guardTarget, designWidth, isCollapsed, clickSpace, clickAgent, spaceMenu, machineMenu,
-  newSpaceHere, newSpace, foldKeys, probeGit, spaceCwd,
+  newSpaceHere, newSpace, foldKeys, probeGit, spaceCwd, spaceMenuItems, nextSel, letterSel, runSpaceItem, SPACE_MENU,
 } from "./lib.js";
 
 const FALLBACK = {
-  foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", border: "#3c3836", input: "#504945",
+  foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", hover: "#32302f", border: "#3c3836", input: "#504945",
   accent: "#fabd2f", solid_foreground: "#141617", working: "#fabd2f", blocked: "#fb4934", done: "#b8bb26",
-  ansi4: "#83a598", ansi5: "#d3869b", ansi6: "#8ec07c",
+  ansi4: "#83a598", ansi5: "#d3869b", ansi6: "#8ec07c", popover: "#1d2021", selected: "#3c3836", chrome: "#141617",
 };
 const col = (name) => theme()?.[name] ?? FALLBACK[name] ?? name;
 const glyph = (name, size, color) => svg(`mods/apollo-spaces/${name}.svg`).size(size).text_color(col(color));
@@ -29,6 +29,8 @@ export default class Spaces extends View {
     this.width = undefined;
     this.guard = {};
     this.query = "";
+    // The space menu takes the keyboard as it opens; one selection (null: none) is shared by pointer and keys.
+    if (this.p.menu === "space") { this.sel = null; this.menuFocus = cx.focus_handle(); this.menuFocus.focus(); return; }
     if (this.p.menu) return;
     this.focus = cx.focus_handle();
     // S6: the search field starts closed. Write only when it is open, so a plain load leaves shared.json alone.
@@ -107,8 +109,10 @@ export default class Spaces extends View {
     let el = h_flex().id(a.id).h(a.height).px(8).gap(8).items_center().rounded(8)
       .tooltip(by.name.attrs.text)
       .on_click(() => clickSpace(space, { run }))
-      .on_mouse_down("right", () => spaceMenu(space, { openOverlay }));
-    el = a.fill ? el.bg(col(a.fill)) : el.hover((s) => s.bg(col("raised")));
+      .on_mouse_down("right", () => spaceMenu(space, { openOverlay }, {
+        spaces: spaces() ?? [], git: this.git ?? {}, platform: herdrWindow()?.platform ?? null, panes: panes() ?? [], home: home(),
+      }));
+    el = a.fill ? el.bg(col(a.fill)) : el.hover((s) => s.bg(col("hover")));
     if (by.chevron) {
       el = el.child(h_flex().id(by.chevron.attrs.id).size(16).flex_none().items_center().justify_center()
         .on_click((_e, cx) => { cx.stop_propagation(); this.toggleFold(foldKeys.spaces, space.id); cx.notify(); })
@@ -134,7 +138,7 @@ export default class Spaces extends View {
     const a = n.attrs;
     let el = h_flex().id(a.id).h(28).pl(10).pr(8).gap(6).items_center().rounded(6)
       .on_click(() => clickAgent(agent, { run }));
-    el = a.focused ? el.bg(col("raised")) : el.hover((s) => s.bg(col("raised")));
+    el = a.focused ? el.bg(col("raised")) : el.hover((s) => s.bg(col("hover")));
     if (a.icon) el = el.child((a.tint ? svg(a.icon).text_color(col(a.iconColor ?? a.color)) : image(a.icon)).size(14).flex_none());
     el = el.child(div().flex_1().text_size(13).font_light().text_color(col(a.color)).truncate().child(a.title));
     for (const c of n.children) el = el.child(c.kind === "pin" ? glyph("pin", 12, "dim").flex_none() : this.mark(c));
@@ -156,10 +160,65 @@ export default class Spaces extends View {
     const p = this.p;
     return v_flex().size_full().p(4).child(
       h_flex().id("new-space-here").h(32).px(8).gap(8).items_center().rounded(6)
-        .hover((s) => s.bg(col("raised")))
+        .hover((s) => s.bg(col("hover")))
         .on_click(() => { newSpaceHere({ machine: p.machine ?? null }, { run }); closeOverlay(p.overlay); })
         .child(glyph("plus", 18, "foreground"))
         .child(div().text_size(14).font_light().text_color(col("foreground")).child("New space here")));
+  }
+
+  // The space menu (props.menu "space"). Only `sel` paints a row: pointer entry and keys both set it,
+  // so exactly one row is highlighted; rows have no .hover(). Disabled rows never take it.
+  spaceMenuPopup() {
+    const p = this.p;
+    const all = spaces() ?? [];
+    const space = all.find((s) => s.id === p.space);
+    if (!space) {
+      if (!this.gone) { this.gone = true; closeOverlay(p.overlay); }
+      return v_flex().id("space-menu").size_full().bg(col("popover"));
+    }
+    const entries = spaceMenuItems({ space, spaces: all, repo: !!p.repo, platform: herdrWindow()?.platform ?? null, panes: panes() ?? [], home: home() });
+    const rows = entries.filter((e) => e.kind === "item");
+    const act = (item) => runSpaceItem(item, p.overlay, { run, openOverlay, closeOverlay });
+    const M = SPACE_MENU;
+    const kids = [];
+    entries.forEach((e, i) => {
+      const gap = i > 0 && entries[i - 1].kind !== "sep" ? M.gap : 0;
+      if (e.kind === "sep") { kids.push(div().h(1).my(4).flex_none().bg(col("border"))); return; }
+      if (e.kind === "title") {
+        kids.push(h_flex().h(M.titleH).px(8).items_center().flex_none()
+          .child(div().flex_1().min_w(0).text_size(12).font_normal().text_color(col("muted")).truncate().child(e.text)));
+        return;
+      }
+      const at = rows.indexOf(e);
+      const on = e.enabled && this.sel === at;
+      let el = h_flex().id(`menu-${e.id}`).h(M.rowH).mt(gap).px(8).gap(8).items_center().rounded(6).flex_none()
+        .border(1).border_color(col(on ? "input" : "popover"))
+        .on_hover((hovered, cx) => {
+          if (!hovered) return;
+          const next = e.enabled ? at : null;
+          if (next !== this.sel) { this.sel = next; cx.notify(); }
+        });
+      if (on) el = el.bg(col(e.danger ? "blocked" : "selected"));
+      if (e.enabled) el = el.cursor_pointer().on_click(() => act(e));
+      const fg = !e.enabled ? "dim" : e.danger ? (on ? "chrome" : "blocked") : "foreground";
+      el = el.child(div().w(16).flex_none())
+        .child(div().flex_1().min_w(0).text_size(14).font_light().text_color(col(fg)).truncate().child(e.label));
+      if (e.shortcut) el = el.child(div().flex_none().text_size(13).font_light().text_color(col("muted")).child(e.shortcut));
+      kids.push(el);
+    });
+    return v_flex().id("space-menu").size_full().p(M.pad).bg(col("popover")).track_focus(this.menuFocus)
+      .on_hover((hovered, cx) => { if (!hovered && this.sel !== null) { this.sel = null; cx.notify(); } })
+      .on_key_down((ev, cx) => {
+        const k = ev.key;
+        if (k === "escape") { closeOverlay(p.overlay); return; }
+        if (k === "enter" || k === "space") { if (this.sel !== null) act(rows[this.sel]); return; }
+        if (["up", "down", "home", "end"].includes(k)) this.sel = nextSel(rows, this.sel, k);
+        else if (ev.key_char && ev.key_char.length === 1 && /\S/.test(ev.key_char) && !ev.modifiers?.platform && !ev.modifiers?.control) {
+          this.sel = letterSel(rows, this.sel, ev.key_char);
+        } else return;
+        cx.notify();
+      })
+      .children(kids);
   }
 
   // Queues a git probe for each space Herdr gives no branch for, when its folder changed (no cx use here).
@@ -179,6 +238,7 @@ export default class Spaces extends View {
 
   render() {
     if (this.p.menu === "machine") return this.popup();
+    if (this.p.menu === "space") return this.spaceMenuPopup();
     const zoom = Number(settings()?.zoom) || 1;
     const width = designWidth(this.width, zoom);
     guardWidth(guardTarget(width, layout()), this.guard, { run });

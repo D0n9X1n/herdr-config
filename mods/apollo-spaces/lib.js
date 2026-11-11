@@ -108,8 +108,99 @@ export function spaceLabel(space, panes, home = "") {
   return folderName(pane?.cwd, home) || space.name;
 }
 
-export const spaceMenu = (space, { openOverlay }) =>
-  openOverlay({ mod: "menu", kind: "popup", props: { tab: "space", target: { space: space.id } } });
+// ---- The space menu: this mod's own popup (props.menu "space"), opened by right-clicking a space ----
+
+export const SPACE_MENU_W = 220;
+// MENU_FRAME: room for the popup frame around the content, as the machine popup leaves (48 for a 32 px row + 2 × 4).
+const MENU_PAD = 4, MENU_TITLE_H = 24, MENU_ROW_H = 30, MENU_GAP = 2, MENU_SEP_H = 1 + 4 + 4, MENU_FRAME = 8;
+
+// A git space: Herdr reports its branch, or the sidebar's probe found a repo (unborn ones too).
+const isGitSpace = (space, git = {}, repo = false) => !!(space?.branch || git[space?.id]?.repo || repo);
+
+// The menu's entries, top to bottom: a title, then items and separators. Shortcuts show only on the
+// active space (the keys act on it). Move up/down stay inside the space's machine block (Herdr's order);
+// the target is the neighbour's index (space.move: 1 = first), else its 1-based place in spaces().
+export function spaceMenuItems({ space, spaces = [], git = {}, repo = false, platform = null, panes = null, home = "" }) {
+  const id = space.id;
+  const keys = !!space.active;
+  const item = (key, label, action, extra = {}) => ({ kind: "item", id: key, label, action, enabled: true, ...extra });
+  const sep = { kind: "sep" };
+  const all = spaces.length ? spaces : [space];
+  const block = all.filter((s) => (s.machine ?? null) === (space.machine ?? null));
+  const at = block.findIndex((s) => s.id === id);
+  const indexOf = (s) => s.index ?? all.indexOf(s) + 1;
+  const move = (key, label, to) => (to
+    ? item(key, label, { run: "space.move", args: { id, index: indexOf(to) } })
+    : item(key, label, null, { enabled: false }));
+  return [
+    { kind: "title", text: spaceLabel(space, panes ?? [], home) },
+    item("rename", "Rename…", { run: "space.rename", args: { id } }, keys ? { shortcut: "Shift+F2" } : {}),
+    ...(space.named ? [item("folder-name", "Use folder name", { run: "space.rename", args: { id, name: "" } })] : []),
+    sep,
+    item("new-tab", "New tab", { run: "tab.new", args: { space: id } }, keys ? { shortcut: platform === "windows" ? "Alt+T" : "⌘T" } : {}),
+    ...(isGitSpace(space, git, repo) ? [
+      item("new-worktree", "New worktree…", { open: { mod: "worktree", kind: "dialog", props: { space: id, action: "new" } } }),
+      item("open-worktree", "Open worktree…", { open: { mod: "worktree", kind: "dialog", props: { space: id, action: "open" } } }),
+    ] : []),
+    sep,
+    move("move-up", "Move up", at > 0 ? block[at - 1] : null),
+    move("move-down", "Move down", at >= 0 && at < block.length - 1 ? block[at + 1] : null),
+    sep,
+    item("close", "Close space…", { run: "space.close", args: { id } }, { danger: true }),
+  ];
+}
+
+// Padding top and bottom, the title and 30 px rows with a 2 px gap between neighbours, separators
+// 1 px with 4 px above and below (no gap next to them). main.js draws exactly this.
+export function spaceMenuHeight(entries) {
+  let h = MENU_PAD * 2;
+  entries.forEach((e, i) => {
+    if (e.kind === "sep") { h += MENU_SEP_H; return; }
+    h += e.kind === "title" ? MENU_TITLE_H : MENU_ROW_H;
+    if (i > 0 && entries[i - 1].kind !== "sep") h += MENU_GAP;
+  });
+  return h;
+}
+export const SPACE_MENU = { pad: MENU_PAD, titleH: MENU_TITLE_H, rowH: MENU_ROW_H, gap: MENU_GAP };
+
+// The one selection (an index into the items) after a key: ↓/↑ wrap and skip disabled rows (from none,
+// ↓ is the first enabled and ↑ the last); home/end. Null when nothing is enabled.
+export function nextSel(rows, sel, key) {
+  const on = rows.map((r, i) => (r.enabled ? i : -1)).filter((i) => i >= 0);
+  if (!on.length) return null;
+  if (key === "home") return on[0];
+  if (key === "end") return on.at(-1);
+  if (key === "down") return sel === null || sel === undefined ? on[0] : (on.find((i) => i > sel) ?? on[0]);
+  if (key === "up") return sel === null || sel === undefined ? on.at(-1) : (on.findLast((i) => i < sel) ?? on.at(-1));
+  return sel ?? null;
+}
+
+// A letter jumps to the next enabled row whose label starts with it, after the selection, cycling.
+export function letterSel(rows, sel, ch) {
+  const c = String(ch ?? "").toLowerCase();
+  if (!c) return sel ?? null;
+  const from = sel === null || sel === undefined ? -1 : sel;
+  for (let k = 1; k <= rows.length; k++) {
+    const i = (from + k) % rows.length;
+    if (rows[i].enabled && rows[i].label.toLowerCase().startsWith(c)) return i;
+  }
+  return sel ?? null;
+}
+
+// Closes the menu first, then acts; a disabled item does nothing.
+export function runSpaceItem(item, overlay, { run, openOverlay, closeOverlay }) {
+  if (!item?.enabled || !item.action) return;
+  closeOverlay(overlay);
+  if (item.action.run) run(item.action.run, item.action.args);
+  else if (item.action.open) openOverlay(item.action.open);
+}
+
+// Opens this mod's space menu at the pointer, sized to its items. `repo` carries the sidebar's probe.
+export function spaceMenu(space, { openOverlay }, { spaces = [], git = {}, platform = null, panes = null, home = "" } = {}) {
+  const entries = spaceMenuItems({ space, spaces, git, platform, panes, home });
+  return openOverlay({ mod: "apollo-spaces", kind: "popup", width: SPACE_MENU_W, height: spaceMenuHeight(entries) + MENU_FRAME,
+    props: { menu: "space", space: space.id, repo: isGitSpace(space, git) } });
+}
 
 export const machineMenu = (group, { openOverlay }) =>
   openOverlay({ mod: "apollo-spaces", kind: "popup", width: 200, height: 48, props: { menu: "machine", machine: group.machine ?? null } });

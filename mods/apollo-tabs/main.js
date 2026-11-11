@@ -13,7 +13,7 @@ import {
 } from "./lib.js";
 
 const FALLBACK = {
-  foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", selected: "#3c3836", border: "#3c3836",
+  foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", hover: "#32302f", selected: "#3c3836", border: "#3c3836",
   working: "#fabd2f", blocked: "#fb4934", done: "#b8bb26", accent: "#fabd2f", popover: "#1d2021", input: "#504945",
 };
 const col = (name) => theme()?.[name] ?? FALLBACK[name] ?? name;
@@ -68,7 +68,7 @@ export default class Tabs extends View {
       .tooltip(p.label)
       .on_mouse_down("left", stop)
       .on_click(() => selectTab(p, { run }));
-    el = p.active ? el.bg(col("selected")) : el.hover((s) => s.bg(col("raised")));
+    el = p.active ? el.bg(col("selected")) : el.hover((s) => s.bg(col("hover")));
     // First, so it is never read as the trailing red "blocked" status mark.
     if (admin) el = el.child(glyph("admin", 14, "blocked").flex_none());
     if (p.icon) el = el.child((p.tint ? svg(p.icon).text_color(col(p.iconColor ?? "muted")) : image(p.icon)).size(14).flex_none());
@@ -79,7 +79,7 @@ export default class Tabs extends View {
     }
     if (p.active) {
       el = el.child(h_flex().id(`close-${p.id}`).size(18).rounded(4).items_center().justify_center()
-        .hover((s) => s.bg(col("raised")))
+        .hover((s) => s.bg(col("hover")))
         .on_mouse_down("left", stop)
         .on_click((_e, cx) => { cx.stop_propagation(); closeTab(p, { run }); })
         .child(glyph("close", 12, "dim")));
@@ -96,7 +96,7 @@ export default class Tabs extends View {
       })
       .child(glyph(child, 16, on ? "foreground" : "dim"))
       .child(div().text_size(13).font_light().text_color(col(on ? "foreground" : "muted")).child(label));
-    el = on ? el.bg(col("selected")) : el.hover((s) => s.bg(col("raised")));
+    el = on ? el.bg(col("selected")) : el.hover((s) => s.bg(col("hover")));
     return el;
   }
 
@@ -107,7 +107,7 @@ export default class Tabs extends View {
       .on_click((_e, cx) => { cx.stop_propagation(); run(b.command); });
     el = b.danger
       ? el.rounded_tr(11).text_color(col("muted")).hover((s) => s.bg(CLOSE_RED).text_color("#ffffff"))
-      : el.text_color(col("muted")).hover((s) => s.bg(col("raised")));
+      : el.text_color(col("muted")).hover((s) => s.bg(col("hover")));
     return el.child(svg(`mods/apollo-tabs/${b.icon}.svg`).size(10));
   }
 
@@ -156,7 +156,7 @@ export default class Tabs extends View {
         })
         .children(tabPills(sp, panes(), { home: home() }).map((p) => this.pill(p, showAdmin(this.admin, sp)))))
       .child(h_flex().id("plus").size(28).rounded(6).flex_none().items_center().justify_center()
-        .hover((s) => s.bg(col("raised")))
+        .hover((s) => s.bg(col("hover")))
         .on_mouse_down("left", stop)
         .on_click(() => this.openPlus())
         .child(glyph("more", 18, "dim")))

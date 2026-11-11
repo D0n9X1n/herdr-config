@@ -4,7 +4,7 @@ import { h_flex } from "gpui-base";
 import { panes, run, theme, props as herdrProps } from "herdr";
 import { paneActions, paneHeader, hoverButtons } from "./lib.js";
 
-const FALLBACK = { foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", border: "#3c3836",
+const FALLBACK = { foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", hover: "#32302f", border: "#3c3836",
   working: "#fabd2f", blocked: "#fb4934", done: "#b8bb26" };
 const col = (name) => theme()?.[name] ?? FALLBACK[name] ?? name;
 const glyph = (name, size, color) => svg(`mods/apollo-pane/${name}.svg`).size(size).text_color(col(color));
@@ -40,7 +40,7 @@ export default class Pane extends View {
     }
     for (const id of hoverButtons(this.hovered)) {
       row = row.child(h_flex().id(id).size(22).rounded(4).flex_none().items_center().justify_center()
-        .hover((s) => s.bg(col("raised")))
+        .hover((s) => s.bg(col("hover")))
         .on_click(() => acts[id].fire())
         .child(glyph(id, 16, "dim")));
     }

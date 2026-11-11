@@ -6,7 +6,7 @@ import {
   collapse, expand, settings, brandView, footerView, isCollapsed,
 } from "./lib.js";
 
-const FALLBACK = { foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", border: "#3c3836" };
+const FALLBACK = { foreground: "#cfbc97", muted: "#d5c4a1", dim: "#928374", raised: "#1c1f20", hover: "#32302f", border: "#3c3836" };
 const col = (name) => theme()?.[name] ?? FALLBACK[name] ?? name;
 const glyph = (name, size, color) => svg(`mods/apollo-chrome/${name}.svg`).size(size).text_color(col(color));
 const handlers = { run, setShared };
@@ -23,7 +23,7 @@ export default class Chrome extends View {
   // A brand control (28×28). It stops the press so the window_drag block does not start a drag.
   control(id, icon, onClick) {
     return h_flex().id(id).size(28).rounded(4).flex_none().items_center().justify_center()
-      .hover((s) => s.bg(col("raised")))
+      .hover((s) => s.bg(col("hover")))
       .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
       .on_click(() => onClick())
       .child(glyph(icon, 18, "dim"));
@@ -46,7 +46,7 @@ export default class Chrome extends View {
 
   footerRow(row, action) {
     return h_flex().id(row.attrs.id).h(32).px(8).gap(8).items_center().rounded(6)
-      .hover((s) => s.bg(col("raised")))
+      .hover((s) => s.bg(col("hover")))
       .on_click(() => action(handlers))
       .child(glyph(row.children[0].kind, 18, "dim"))
       .child(div().text_size(14).font_light().text_color(col("muted")).truncate().child(row.attrs.label));

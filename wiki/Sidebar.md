@@ -6,7 +6,22 @@
 
 Each space shows a tile, its name, its branch and one status mark. The tile is a small icon on the space's color: a server for another machine, a house for the home folder, a book for a git repo, and a folder otherwise. Under a space, each agent has a row with its icon, title and mark. Claude Code shows Apollo's own star in Claude orange, here, on tab pills and in pane headers; other programs keep Herdr's icon. A working agent shows a spinning arc, a blocked one a diamond, and a done one a check; an idle one shows nothing. A space shows its most urgent agent: blocked, then done, then working.
 
-Click a space to select it; right-click it for Herdr's space menu. Click an agent to focus it. Rest the pointer on a space for half a second to see its full name, also when the sidebar is collapsed.
+Click a space to select it; right-click it for the space menu. Click an agent to focus it. Rest the pointer on a space for half a second to see its full name, also when the sidebar is collapsed.
+
+## Space menu
+
+Right-click a space to open its menu at the pointer. The top line is the space's name. Then:
+
+- **Rename…**: Herdr asks for the new name (`space.rename`).
+- **Use folder name**: only for a space you renamed; it follows the folder again.
+- **New tab** in this space (`tab.new`).
+- **New worktree…** and **Open worktree…**: only for a git space; they open Herdr's `worktree` dialog.
+- **Move up** and **Move down** (`space.move`): a space moves only among the spaces of its own machine, so the first and last there are greyed out.
+- **Close space…**: Herdr asks first (`space.close`).
+
+On the active space, rows show their keys: `shift-f2` for Rename…, and `alt-t` on Windows or `cmd-t` on macOS for New tab.
+
+One row is highlighted at a time. Moving the pointer onto a row highlights it; Up and Down move the same highlight and wrap, Home and End jump to the ends, and a letter jumps to the next row starting with it. Enter or Space runs the row, and Escape closes the menu. Greyed-out rows are skipped. The menu closes before its action runs.
 
 ## Names
 

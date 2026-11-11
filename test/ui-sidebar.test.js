@@ -43,7 +43,7 @@ test("chrome: search toggles apollo.sidebar.search; footer Settings, no Add mach
   assert.deepEqual(runs(footer), [{ name: "app.settings", args: undefined }]);
 });
 
-test("spaces: clicks select a space, focus an agent, and start a new space whose first tab is named", async () => {
+test("spaces: clicks select a space, focus an agent, and start an unnamed new space", async () => {
   const m = await loadMod(SPACES, { data: data(), size: { width: 256, height: 600 } });
   m.click("space-s2");
   m.click("agent-t7");
@@ -51,7 +51,7 @@ test("spaces: clicks select a space, focus an agent, and start a new space whose
   assert.deepEqual(runs(m), [
     { name: "space.select", args: { id: "s2" } },
     { name: "agent.focus", args: { terminal: "t7" } },
-    { name: "space.new", args: { tab: "Terminal" } },
+    { name: "space.new", args: {} },
   ]);
 });
 
@@ -72,7 +72,7 @@ test("New space here, with a remote space active: devbox gets machine devbox, th
     ["apollo-spaces", "popup", { menu: "machine", machine: "devbox" }],
     ["apollo-spaces", "popup", { menu: "machine", machine: null }],
   ]);
-  const want = [{ machine: "devbox", tab: "devbox" }, { machine: "", tab: "Terminal" }];
+  const want = [{ machine: "devbox" }, { machine: "" }];
   for (const [i, spec] of specs.entries()) {
     const pop = await loadMod(SPACES, { data: d, props: { ...spec.props, overlay: `o${i}` } });
     pop.click("new-space-here");
@@ -243,5 +243,5 @@ test("Windows: chrome footer and the spaces' New space work the same as on macOS
   assert.deepEqual(footer.ids().filter((id) => ["settings", "add-machine", "account"].includes(id)), ["settings"]);
   const m = await loadMod(SPACES, { data: { ...d, focused: { space: "s1", tab: "b1", pane: "p1", cwd: "C:\\Users\\ann\\api" }, home: "C:\\Users\\ann" }, size: { width: 256, height: 600 } });
   m.click("new-space");
-  assert.deepEqual(runs(m), [{ name: "space.new", args: { tab: "api" } }]);
+  assert.deepEqual(runs(m), [{ name: "space.new", args: {} }]);
 });

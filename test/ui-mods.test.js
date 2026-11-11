@@ -50,8 +50,8 @@ test("+ popup: hides uninstalled agents; every pick runs its command and closes 
   assert.deepEqual(m.rec.calls.filter((c) => c.fn === "knownAgents").map((c) => c.args), [{ on: null }]);
   for (const id of ["terminal", "agent-claude", "new-space", "new-worktree", "open-worktree"]) m.click(id);
   assert.deepEqual(runs(m), [
-    { name: "tab.new", args: { space: "s1", name: "w" } }, { name: "tab.new", args: { space: "s1", name: "Claude Code", argv: ["claude"] } },
-    { name: "space.new", args: { tab: "r" } },
+    { name: "tab.new", args: { space: "s1" } }, { name: "tab.new", args: { space: "s1", argv: ["claude"] } },
+    { name: "space.new", args: {} },
   ]);
   assert.deepEqual(overlays(m), [
     { mod: "worktree", kind: "dialog", props: { space: "s1", action: "new" } },
@@ -509,7 +509,7 @@ for (const ip of [undefined, {}]) {
   test(`spaces machine popup from props() alone (${tag})`, async () => {
     const m = await loadMod("mods/apollo-spaces", { data: tabsData(), props: { menu: "machine", machine: "devbox", overlay: "o1" }, initProps: ip });
     m.click("new-space-here");
-    assert.deepEqual(runs(m), [{ name: "space.new", args: { machine: "devbox", tab: "devbox" } }]);
+    assert.deepEqual(runs(m), [{ name: "space.new", args: { machine: "devbox" } }]);
   });
 }
 

@@ -37,7 +37,7 @@ test("chrome: search toggles apollo.sidebar.search; footer Settings, no Add mach
   const brand = await loadMod(CHROME, { data: data(), size: { width: 300, height: 48 } });
   brand.click("search");
   assert.deepEqual(brand.rec.calls.filter((c) => c.fn === "setShared").map((c) => [c.name, c.args]), [["apollo.sidebar.search", true]]);
-  const footer = await loadMod(CHROME, { data: data(), props: { footer: true }, size: { width: 300, height: 96 } });
+  const footer = await loadMod(CHROME, { data: data(), props: { footer: true }, size: { width: 300, height: 48 } });
   assert.ok(!footer.ids().includes("add-machine"));
   footer.click("settings");
   assert.deepEqual(runs(footer), [{ name: "app.settings", args: undefined }]);
@@ -239,8 +239,8 @@ test("chrome collapsed: the same logo, and no app name", async () => {
 
 test("Windows: chrome footer and the spaces' New space work the same as on macOS", async () => {
   const d = data({ data: { window: { platform: "windows", fullscreen: false, buttons: true } } });
-  const footer = await loadMod(CHROME, { data: d, props: { footer: true }, size: { width: 256, height: 96 } });
-  assert.deepEqual(footer.ids().filter((id) => ["settings", "add-machine", "account"].includes(id)), ["settings", "account"]);
+  const footer = await loadMod(CHROME, { data: d, props: { footer: true }, size: { width: 256, height: 48 } });
+  assert.deepEqual(footer.ids().filter((id) => ["settings", "add-machine", "account"].includes(id)), ["settings"]);
   const m = await loadMod(SPACES, { data: { ...d, focused: { space: "s1", tab: "b1", pane: "p1", cwd: "C:\\Users\\ann\\api" }, home: "C:\\Users\\ann" }, size: { width: 256, height: 600 } });
   m.click("new-space");
   assert.deepEqual(runs(m), [{ name: "space.new", args: { tab: "api" } }]);

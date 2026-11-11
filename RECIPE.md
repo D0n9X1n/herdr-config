@@ -11,7 +11,7 @@ Left to right:
 - **Sidebar**, 256 px wide (184–480), on `chrome` `#141617`:
   - **Brand row**, 48 px, draggable. The native traffic lights at `[12, 16]`; nothing is drawn in x 12–70, y 10–30. Then the Apollo logo (`mods/apollo-chrome/logo.png`, 20 px, radius 5) and "Apollo" in 14 px semibold `foreground` `#cfbc97`. On the right, `search` and `panel-close`, 28×28 each.
   - **Spaces block**, 8 px side padding. A full-width "New space" button (32 px, radius 8, `raised` `#1c1f20`, 1 px `border` `#3c3836`). Then one 44 px row per space: a fold chevron (only when the space has agents), a 22×22 tile in `ansi4`, `ansi5` or `ansi6` holding a 14 px kind glyph (`server` for a remote machine, `home` for `~`, `repo` for a git space, else `folder`), the name (13 px semibold) over a 14 px `branch` glyph and branch name (12 px `dim` `#928374`), and a 14 px status mark on the right. Under an unfolded space, 28 px agent rows: program icon (14), title (12 px `muted` `#d5c4a1`), status mark, with a 1 px guide line at x 20. The active space has an `accent` `#fabd2f` fill, and its text and marks turn `solid_foreground` `#141617`. Machine headers appear only with two or more machines.
-  - **Footer**, 96 px: a 1 px top line, the Settings row (32 px, 18 px icon, 13 px label), then the account row: a 28 px avatar circle with an initial, the user's name, and "N agents" in 11.5 px `dim`.
+  - **Footer**, 48 px: a 1 px top line and the Settings row (32 px, 18 px icon, 13 px label). It shows no account row and no user name.
 - **Main column**, 6 px padding and gap:
   - **Work card**, radius 12, 1 px `border`, on `background` `#141617`:
     - **Tab row**, 40 px, draggable: tab pills (28 px, radius 6, program icon, name, status mark; the active pill on `selected` `#3c3836` with a close button), then ⊕ (28×28), then the Files, Changes and Specs buttons.
@@ -40,7 +40,7 @@ Left to right:
 ## Built from
 
 - **Layout** `layouts/apollo.json`: a row with `titlebar: "none"`, `traffic_lights: [12, 16]`, theme `{light: "paper", dark: "apollo"}`.
-  - `sidebar` column (256 px, `min` 184, `max` 480, `chrome`): `brand` block (48 px, `window_drag`, `apollo-chrome`), `spaces` block (weight 1, `apollo-spaces`), `footer` block (96 px, `apollo-chrome` with `props: {footer: true}`).
+  - `sidebar` column (256 px, `min` 184, `max` 480, `chrome`): `brand` block (48 px, `window_drag`, `apollo-chrome`), `spaces` block (weight 1, `apollo-spaces`), `footer` block (48 px, `apollo-chrome` with `props: {footer: true}`).
   - `main` column (padding 6, gap 6): `card` column (radius 12, 1 px `border`) with `tabs` block (40 px, `window_drag`, `apollo-tabs`) and `work` row; `status` block (24 px, `apollo-status`).
   - `work` row: `tab` block (`tab: "active"`, pane header `apollo-pane` at 34 px, `lone: true`) and `panel` stack (360 px, `hidden`, `active: "changes"`) of `files`, `apollo-changes` and `apollo-specs`.
 - **Theme** `themes/apollo.json`: terminal colors from the Apollo palette; panel colors `chrome`/`canvas` `#141617`, `surface`/`popover` `#1d2021`, `raised`/`hover` `#1c1f20`, `selected`/`border` `#3c3836`, `input` `#504945`, `foreground` `#cfbc97`, `muted` `#d5c4a1`, `dim`/`idle` `#928374`, `accent`/`working`/`solid` `#fabd2f`, `solid_foreground` `#141617`, `blocked` `#fb4934`, `done` `#b8bb26`.
@@ -63,7 +63,6 @@ Left to right:
 - Mods can't share files, so `branch.svg` is in `apollo-spaces`, `apollo-pane` and `apollo-status`, and the status marks are in `apollo-spaces`, `apollo-tabs` and `apollo-pane`. Keep the copies equal.
 - OverlaySpec can't anchor to an element. The + menu's position comes from the layout and the measured tab row; before the row is measured, it opens at the pointer.
 - `pane.split` moves focus to the new pane.
-- The account row reads `home()`; on another machine it shows that user.
 
 ## Done when
 

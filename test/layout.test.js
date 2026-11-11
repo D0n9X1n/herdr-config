@@ -41,7 +41,7 @@ export function requirements(L) {
   want("spaces weight 1", same(spaces.size, { weight: 1 }));
   want("spaces mod", spaces.content?.mod === "apollo-spaces");
   const footer = n("footer");
-  want("footer 96 px", same(footer.size, { px: 96 }));
+  want("footer 48 px", same(footer.size, { px: 48 }));
   want("footer apollo-chrome props.footer", footer.content?.mod === "apollo-chrome" && footer.content?.props?.footer === true);
   const main = n("main");
   want("main is a column", main.type === "column");

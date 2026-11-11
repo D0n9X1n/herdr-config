@@ -21,7 +21,7 @@ Herdr 用编号称呼没人命名的标签页：1、2、3。Apollo 会给它创�
 
 ## 底栏
 
-底栏有 Settings 行和账户行，高 96 px。要添加机器，在终端里运行 `hc machine add <host>`。
+底栏只有 Settings 行，不显示用户名，高 48 px。要添加机器，在终端里运行 `hc machine add <host>`。
 
 ## 折叠
 

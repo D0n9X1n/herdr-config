@@ -6,8 +6,8 @@
 
 | Key | Action |
 |---|---|
-| `cmd-t`, `cmd-shift-t` | new tab, named after its folder (`apollo-tabs.terminal`, Apollo layout only) |
-| `cmd-n` | new space, its first tab named after its folder (`apollo-tabs.space`, Apollo layout only) |
+| `cmd-t`, `cmd-shift-t` | new tab, unnamed so it follows the naming rule (`apollo-tabs.terminal`, Apollo layout only) |
+| `cmd-n` | new space, unnamed so it follows the naming rule (`apollo-tabs.space`, Apollo layout only) |
 | `cmd-w` | close pane (the last pane closes the tab) |
 | `cmd-left` / `cmd-right` | previous / next tab (also in the terminal) |
 | `cmd-shift-z` | zoom pane |
@@ -20,7 +20,7 @@
 | `cmd-[` | unbound (copy mode in SonicTerm) |
 | `cmd-9` | last tab (`apollo-tabs.last`) |
 
-Every other Herdr default stays. The `cmd-t`, `cmd-shift-t` and `cmd-n` keys above sit in a `layout:apollo` section, so they name tabs only while the Apollo layout shows; in any other layout they are Herdr's own new tab and new space. `cmd-n` stays "new space": Herdr has no new-window command.
+Every other Herdr default stays. The `cmd-t`, `cmd-shift-t` and `cmd-n` keys above sit in a `layout:apollo` section, so they work this way only while the Apollo layout shows; in any other layout they are Herdr's own new tab and new space. `cmd-n` stays "new space": Herdr has no new-window command.
 
 ## Unbound SonicTerm actions
 
@@ -29,7 +29,7 @@ Herdr has no command for these, so they have no key: broadcast, pane resize, cop
 ## Commands you can bind
 
 - `apollo-tabs.last` selects the last tab of the space. `cmd-9` runs it.
-- `apollo-tabs.terminal` makes a terminal tab named after the focused folder, and `apollo-tabs.space` a space whose first tab is named the same way (see [Sidebar](Sidebar)).
+- `apollo-tabs.terminal` makes an unnamed terminal tab and `apollo-tabs.space` an unnamed space, so both follow the naming rule (see [Sidebar](Sidebar)).
 - `apollo-changes.next` selects the next file in the Changes panel and shows its diff. It wraps at the end. Bind it in `keys.json`, for example `"cmd-alt-n": "apollo-changes.next"` in `global`, or run `herdr-app do apollo-changes.next`.
 
 ## Windows

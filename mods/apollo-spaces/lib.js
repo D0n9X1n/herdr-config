@@ -74,26 +74,19 @@ export function agentOrder(spaces, agents, _viewState = {}) {
   return spaces.flatMap((s) => (by.get(s.id) ?? []).map((a) => a.address));
 }
 
-// The New space button: Herdr's default machine (the focused space's), first tab named after the focused folder.
-export const newSpace = ({ run }, { cwd = null, home = "" } = {}) => run("space.new", { tab: folderName(cwd, home) ?? "Terminal" });
+// A new space is unnamed, so Herdr names it after its repo or folder and its tabs follow apollo-tabs' naming
+// rule; when someone renamed the current space, the new one gets that name too. A copy of apollo-tabs'
+// newSpaceArgs: change them together.
+export const newSpaceArgs = (current) => (current?.named && current.name ? { name: current.name } : {});
 
-// "" targets this computer explicitly, which matters while a remote space is active.
-// The new space's first tab: the machine's name for a remote space (it starts in that machine's home), else
-// the focused folder (the space starts there). A copy of apollo-tabs' folderName: change them together.
-export function newSpaceHere(group, { run }, { cwd = null, home = "" } = {}) {
-  const tab = group.machine ?? folderName(cwd, home) ?? "Terminal";
-  return run("space.new", { machine: group.machine ?? "", tab });
-}
+// The New space button: Herdr's default machine (the focused space's).
+export const newSpace = ({ run }, { current = null } = {}) => run("space.new", newSpaceArgs(current));
 
-// The last folder of a path ("/" or "\\"), "~" at home (any case on Windows); null for none or the root.
-export function folderName(cwd, home = "") {
-  const trim = (s) => String(s ?? "").replace(/[\\/]+$/, "");
-  const path = trim(cwd);
-  if (!path) return null;
-  const win = /^[a-z]:|\\/i.test(path);
-  const h = trim(home);
-  if (h && (win ? path.toLowerCase() === h.toLowerCase() : path === h)) return "~";
-  return path.split(/[\\/]/).pop() || null;
+// "" targets this computer explicitly, which matters while a remote space is active. The current space's
+// name carries over only to a new space on the same machine.
+export function newSpaceHere(group, { run }, { current = null } = {}) {
+  const same = current && (current.machine ?? null) === (group.machine ?? null);
+  return run("space.new", { machine: group.machine ?? "", ...newSpaceArgs(same ? current : null) });
 }
 
 export const spaceMenu = (space, { openOverlay }) =>

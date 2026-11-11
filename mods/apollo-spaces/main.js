@@ -3,7 +3,7 @@ import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import {
   spaces, agents, panes, exec, run, openOverlay, closeOverlay, setAgentOrder, shared, setShared, settings, theme, layout,
-  props as herdrProps, focused, home,
+  props as herdrProps,
 } from "herdr";
 import {
   spacesView, agentOrder, guardWidth, guardTarget, designWidth, isCollapsed, clickSpace, clickAgent, spaceMenu, machineMenu,
@@ -77,7 +77,7 @@ export default class Spaces extends View {
     return h_flex().id("new-space").h(32).px(10).gap(8).items_center().rounded(8).flex_none()
       .bg(col("raised")).border(1).border_color(col("border"))
       .hover((s) => s.border_color(col("input")))
-      .on_click(() => newSpace({ run }, { cwd: focused()?.cwd, home: home() }))
+      .on_click(() => newSpace({ run }, { current: (spaces() ?? []).find((s) => s.active) }))
       .child(glyph("plus", 18, "foreground"))
       .child(div().text_size(14).font_light().text_color(col("foreground")).child("New space"));
   }
@@ -157,7 +157,7 @@ export default class Spaces extends View {
     return v_flex().size_full().p(4).child(
       h_flex().id("new-space-here").h(32).px(8).gap(8).items_center().rounded(6)
         .hover((s) => s.bg(col("raised")))
-        .on_click(() => { newSpaceHere({ machine: p.machine ?? null }, { run }, { cwd: focused()?.cwd, home: home() }); closeOverlay(p.overlay); })
+        .on_click(() => { newSpaceHere({ machine: p.machine ?? null }, { run }, { current: (spaces() ?? []).find((s) => s.active) }); closeOverlay(p.overlay); })
         .child(glyph("plus", 18, "foreground"))
         .child(div().text_size(14).font_light().text_color(col("foreground")).child("New space here")));
   }

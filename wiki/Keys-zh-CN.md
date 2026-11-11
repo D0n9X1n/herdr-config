@@ -6,8 +6,8 @@
 
 | 按键 | 动作 |
 |---|---|
-| `cmd-t`、`cmd-shift-t` | 新建标签页，用它的文件夹命名（`apollo-tabs.terminal`，只在 Apollo 布局中） |
-| `cmd-n` | 新建空间，第一个标签页用它的文件夹命名（`apollo-tabs.space`，只在 Apollo 布局中） |
+| `cmd-t`、`cmd-shift-t` | 新建标签页，不命名，所以遵循命名规则（`apollo-tabs.terminal`，只在 Apollo 布局中） |
+| `cmd-n` | 新建空间，不命名，所以遵循命名规则（`apollo-tabs.space`，只在 Apollo 布局中） |
 | `cmd-w` | 关闭窗格（最后一个窗格会关闭标签页） |
 | `cmd-left` / `cmd-right` | 上一个 / 下一个标签页（终端里也一样） |
 | `cmd-shift-z` | 放大窗格 |
@@ -20,7 +20,7 @@
 | `cmd-[` | 不绑定（在 SonicTerm 里是复制模式） |
 | `cmd-9` | 最后一个标签页（`apollo-tabs.last`） |
 
-其他 Herdr 默认快捷键都保留。上面的 `cmd-t`、`cmd-shift-t` 和 `cmd-n` 放在 `layout:apollo` 部分，所以只在显示 Apollo 布局时给标签页命名；在其他布局里，它们是 Herdr 自己的新建标签页和新建空间。`cmd-n` 仍然是"新建空间"：Herdr 没有新建窗口的命令。
+其他 Herdr 默认快捷键都保留。上面的 `cmd-t`、`cmd-shift-t` 和 `cmd-n` 放在 `layout:apollo` 部分，所以只在显示 Apollo 布局时这样工作；在其他布局里，它们是 Herdr 自己的新建标签页和新建空间。`cmd-n` 仍然是"新建空间"：Herdr 没有新建窗口的命令。
 
 ## 不绑定的 SonicTerm 动作
 
@@ -29,7 +29,7 @@ Herdr 没有这些动作的命令，所以它们没有快捷键：广播输入�
 ## 可以绑定的命令
 
 - `apollo-tabs.last` 选中当前空间的最后一个标签页。`cmd-9` 运行它。
-- `apollo-tabs.terminal` 新建一个用当前文件夹命名的终端标签页，`apollo-tabs.space` 新建一个空间，第一个标签页也这样命名（见[侧边栏](Sidebar-zh-CN)）。
+- `apollo-tabs.terminal` 新建一个不命名的终端标签页，`apollo-tabs.space` 新建一个不命名的空间，两者都遵循命名规则（见[侧边栏](Sidebar-zh-CN)）。
 - `apollo-changes.next` 在 Changes 面板中选中下一个文件并显示它的 diff，到末尾后回到开头。可以在 `keys.json` 里绑定，例如在 `global` 里写 `"cmd-alt-n": "apollo-changes.next"`，也可以运行 `herdr-app do apollo-changes.next`。
 
 ## Windows

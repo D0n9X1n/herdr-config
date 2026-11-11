@@ -26,7 +26,7 @@ test("README opens with a centered header: title, tagline, CI/version/MIT badges
   assert.match(head, /^# Apollo$/m);
   assert.match(head, /^\*\*Yet, just another [^*]+\*\*$/m);
   assert.match(head, /actions\/workflows\/ci\.yml\/badge\.svg/);
-  assert.match(head, /img\.shields\.io\/github\/v\/tag\/D0n9X1n\/herdr-config/);
+  assert.match(head, /img\.shields\.io\/github\/v\/tag\/MOSconfig\/herdr-config/);
   assert.match(head, /license-MIT/);
   assert.ok(head.includes("[Documentation](wiki/Home.md) · [简体中文文档](wiki/Home-zh-CN.md)"));
 });

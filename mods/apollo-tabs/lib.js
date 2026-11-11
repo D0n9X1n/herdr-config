@@ -3,31 +3,28 @@
 export const activeSpace = (spaces) => (spaces ?? []).find((s) => s.active) ?? null;
 
 // One pill per tab of the space: icon from the tab's agent pane, else its first pane.
-// The naming rule: a tab someone renamed keeps its name. Any other tab shows its program's name when that is
-// not a shell (Claude Code, Neovim), else the space's name (else its folder), never its number, so it follows
-// the space when the space's name changes. A name already shown in the row gets 2, 3, ...
+// The title: the name someone gave the tab, else the space's shown name (the folder it is in now, see
+// spaceLabel). Every title ends with the tab's position, "#1", "#2", ..., the number its tab.select:N key
+// (alt-N on Windows, cmd-N on macOS) goes to.
 export function tabPills(space, panes, { home = "" } = {}) {
   if (!space) return [];
-  const taken = space.tabs.filter((t) => t.named).map((t) => t.name);
-  return space.tabs.map((t) => {
+  const base = spaceLabel(space, panes, home);
+  return space.tabs.map((t, i) => {
     const own = (panes ?? []).filter((p) => p.tab === t.id);
     const shown = own.find((p) => p.program?.agent || p.status) ?? own[0] ?? null;
     const prog = shown?.program ?? null;
-    const auto = !shown ? null : prog && !prog.shell ? prog.name : (space.name || folderName(shown.cwd, home) || prog?.name);
-    let label = t.name;
-    if (!t.named && auto) { label = uniqueName(auto, taken); taken.push(label); }
+    const title = t.named ? t.name : base;
     return {
       id: t.id, active: !!t.active, status: t.status ?? null,
-      label,
+      label: `${title} #${t.index ?? i + 1}`,
       ...(({ icon, tint, color }) => ({ icon, tint, iconColor: color }))(agentIcon(prog)),
     };
   });
 }
 
 // ---- Names ----
-// Apollo leaves the tabs and spaces it makes unnamed, so tabPills' naming rule applies to them. apollo-specs
-// keeps copies of folderName / uniqueName and apollo-spaces a copy of newSpaceArgs (mods don't share files):
-// change them together.
+// Apollo leaves the tabs and spaces it makes unnamed, so their titles follow the space's folder (see tabPills).
+// apollo-spaces keeps copies of folderName / spaceLabel (mods don't share files): change them together.
 
 // The last folder of a path ("/" or "\\"), "~" at home (any case on Windows); null for none or the root.
 export function folderName(cwd, home = "") {
@@ -40,18 +37,20 @@ export function folderName(cwd, home = "") {
   return path.split(/[\\/]/).pop() || null;
 }
 
-// base, else "base 2", "base 3", ... : the first not taken.
-export function uniqueName(base, taken) {
-  const used = new Set(taken ?? []);
-  if (!used.has(base)) return base;
-  let n = 2;
-  while (used.has(`${base} ${n}`)) n += 1;
-  return `${base} ${n}`;
+// A space's shown name: the name someone gave it; else the folder it is in now: its active tab's focused
+// terminal, else that tab's first terminal with a folder, else any of its terminals; with no terminal
+// folder known, Herdr's name. It follows each `cd`.
+export function spaceLabel(space, panes, home = "") {
+  if (!space) return "";
+  if (space.named) return space.name;
+  const tabs = space.tabs ?? [];
+  const ids = new Set(tabs.map((t) => t.id));
+  const own = (panes ?? []).filter((p) => ids.has(p.tab) && p.cwd);
+  const activeTab = (tabs.find((t) => t.active) ?? tabs[0])?.id;
+  const here = own.filter((p) => p.tab === activeTab);
+  const pane = here.find((p) => p.focused) ?? here[0] ?? own[0] ?? null;
+  return folderName(pane?.cwd, home) || space.name;
 }
-
-// A new space is unnamed, so Herdr names it after its repo or folder (it starts in the focused folder, so that
-// is the current space's); when someone renamed the current space, the new one gets that name too.
-export const newSpaceArgs = (current) => (current?.named && current.name ? { name: current.name } : {});
 
 export const selectTab = (tab, { run }) => run("tab.select", { id: tab.id });
 export const closeTab = (tab, { run }) => run("tab.close", { id: tab.id });
@@ -63,7 +62,7 @@ export function onWheel(dy, { run }) {
 
 // nextCommand() handler. Returns whether it handled c.
 // `last` selects the active space's last tab by id. `terminal` and `space` (the Apollo layout's new-tab and
-// new-space keys) make an unnamed tab or space, so the naming rule applies (see tabPills and newSpaceArgs).
+// new-space keys) make an unnamed tab or space, so its title follows the folder (see tabPills).
 export function handleCommand(c, spaces, { run }, { panes = [], home = "", cwd = null } = {}) {
   const sp = activeSpace(spaces);
   if (c === "terminal") {
@@ -71,7 +70,7 @@ export function handleCommand(c, spaces, { run }, { panes = [], home = "", cwd =
     return true;
   }
   if (c === "space") {
-    run("space.new", newSpaceArgs(sp));
+    run("space.new", {});
     return true;
   }
   if (c !== "last") return false;
@@ -109,13 +108,13 @@ export function plusMenu(agents) {
   ]);
 }
 
-// Tabs and spaces made here are unnamed, so the naming rule applies (see tabPills and newSpaceArgs).
+// Tabs and spaces made here are unnamed, so their titles follow the folder (see tabPills).
 export function pickPlus(item, space, { run, openOverlay }, { panes = [], home = "", cwd = null } = {}) {
   const a = item.attrs;
   switch (a.action) {
     case "terminal": return run("tab.new", { space: space.id });
     case "agent": return run("tab.new", { space: space.id, argv: a.run });
-    case "space": return run("space.new", newSpaceArgs(space));
+    case "space": return run("space.new", {});
     case "worktree": return openOverlay({ mod: "worktree", kind: "dialog", props: { space: space.id, action: a.worktree } });
     default: return null;
   }

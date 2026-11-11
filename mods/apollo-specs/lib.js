@@ -89,7 +89,7 @@ export function workOnIt(spec, { space, repo, agents }, { run, notify }) {
   return run("tab.new", { space: space.id, name, folder: repo, argv: a.run, task: `Work on the spec ${spec.path}. Read it first.` });
 }
 
-// base, else "base 2", "base 3", ... : the first not taken. A copy of apollo-tabs' uniqueName: change them together.
+// base, else "base 2", "base 3", ... : the first not taken.
 export function uniqueName(base, taken) {
   const used = new Set(taken ?? []);
   if (!used.has(base)) return base;

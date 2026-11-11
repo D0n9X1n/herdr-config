@@ -2,13 +2,14 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { recorder } from "./helpers/stubs.js";
 import { tabSpace, tabPanes } from "./fixtures/tabs.js";
-import { folderName, uniqueName, newSpaceArgs, handleCommand, tabPills } from "../mods/apollo-tabs/lib.js";
-import { newSpaceArgs as spacesNewSpaceArgs, newSpaceHere, newSpace } from "../mods/apollo-spaces/lib.js";
-import { workOnIt } from "../mods/apollo-specs/lib.js";
+import { folderName, spaceLabel, handleCommand, tabPills } from "../mods/apollo-tabs/lib.js";
+import { folderName as spacesFolderName, spaceLabel as spacesSpaceLabel, newSpaceHere, newSpace, spacesView } from "../mods/apollo-spaces/lib.js";
+import { workOnIt, uniqueName } from "../mods/apollo-specs/lib.js";
+import { findAll } from "./helpers/tree.js";
 
 const runs = (r) => r.calls.map(({ name, args }) => ({ name, args }));
 
-for (const [tag, fn] of [["apollo-tabs", folderName]]) {
+for (const [tag, fn] of [["apollo-tabs", folderName], ["apollo-spaces", spacesFolderName]]) {
   test(`folderName (${tag}): last folder, ~ at home, macOS and Windows paths`, () => {
     assert.equal(fn("/home/ann/Public/herdr-config", "/home/ann"), "herdr-config");
     assert.equal(fn("/home/ann/api/", "/home/ann"), "api");
@@ -34,11 +35,23 @@ const focusedIn = (space, tab, cwd) => [
   { pane: "x2", tab: space.tabs[tab].id, cwd, focused: true, program: null },
 ];
 
-for (const [tag, fn] of [["apollo-tabs", newSpaceArgs], ["apollo-spaces", spacesNewSpaceArgs]]) {
-  test(`newSpaceArgs (${tag}): a renamed space's name carries over; otherwise the new space is unnamed`, () => {
-    assert.deepEqual(fn({ name: "Terminal Profile", named: true }), { name: "Terminal Profile" });
-    assert.deepEqual(fn({ name: "api", named: false }), {});
-    assert.deepEqual(fn(null), {});
+// A space with two tabs; tab b2 is active. Panes: b1 in /w/api, b2 in /w/web/src (p3 focused) and /w/web.
+const twoTabs = (over = {}) => ({ id: "s1", name: "dot-configs", named: false, folder: "/w/start", machine: null,
+  tabs: [{ id: "b1", index: 1, name: "1", named: false, active: false }, { id: "b2", index: 2, name: "2", named: false, active: true }], ...over });
+const twoTabPanes = () => [
+  { pane: "p1", tab: "b1", cwd: "/w/api", focused: false },
+  { pane: "p2", tab: "b2", cwd: "/w/web", focused: false },
+  { pane: "p3", tab: "b2", cwd: "/w/web/src", focused: true },
+];
+
+for (const [tag, fn] of [["apollo-tabs", spaceLabel], ["apollo-spaces", spacesSpaceLabel]]) {
+  test(`spaceLabel (${tag}): a given name, else the folder the space is in now`, () => {
+    assert.equal(fn(twoTabs({ name: "Work", named: true }), twoTabPanes(), "/home/ann"), "Work");
+    assert.equal(fn(twoTabs(), twoTabPanes(), "/home/ann"), "src", "the active tab's focused terminal");
+    assert.equal(fn(twoTabs(), twoTabPanes().map((p) => ({ ...p, focused: false })), "/home/ann"), "web", "else that tab's first terminal");
+    assert.equal(fn(twoTabs(), twoTabPanes().filter((p) => p.tab === "b1"), "/home/ann"), "api", "else any terminal of the space");
+    assert.equal(fn(twoTabs(), [], "/home/ann"), "dot-configs", "no terminal folder known: Herdr's name, not the start folder");
+    assert.equal(fn(twoTabs(), [{ pane: "p", tab: "b2", cwd: "C:\\Users\\ann", focused: true }], "C:\\Users\\ann"), "~");
   });
 }
 
@@ -63,33 +76,32 @@ test("apollo-tabs.terminal with no space open still makes a tab (Herdr starts a 
   assert.deepEqual(runs(r), [{ name: "tab.new", args: {} }]);
 });
 
-test("a shell tab nobody renamed shows the space's name, not its number or the shell's name", () => {
-  const pills = tabPills(tabSpace(), tabPanes(), { home: "/home/ann" });
-  assert.deepEqual(pills.map((p) => p.label), ["Claude Code", "fix login", "dot-configs"]);
+test("tab titles: the space's folder, or the tab's given name, always followed by #position", () => {
+  const space = twoTabs({ tabs: [...twoTabs().tabs, { id: "b3", index: 3, name: "notes", named: true, active: false }] });
+  const panes = [...twoTabPanes(), { pane: "p4", tab: "b3", cwd: "/w/api", focused: false }];
+  assert.deepEqual(tabPills(space, panes).map((p) => p.label), ["src #1", "src #2", "notes #3"]);
+  // cd in the focused terminal: the unnamed titles follow the folder; the renamed one keeps its name and number.
+  const moved = panes.map((p) => (p.pane === "p3" ? { ...p, cwd: "/w/docs" } : p));
+  assert.deepEqual(tabPills(space, moved).map((p) => p.label), ["docs #1", "docs #2", "notes #3"]);
+  // A named space keeps its name in the titles.
+  assert.deepEqual(tabPills({ ...space, name: "Work", named: true }, moved).map((p) => p.label), ["Work #1", "Work #2", "notes #3"]);
 });
 
-test("the naming rule: unnamed tabs follow the space's name and are numbered; a renamed tab keeps its name", () => {
-  const shell = { key: "zsh", name: "zsh", icon: "icons/zsh.svg", tint: true, tile: null, color: null, shell: true, agent: false };
-  const base = tabSpace(3);
-  const space = { ...base, name: "Terminal Profile",
-    tabs: base.tabs.map((t, i) => ({ ...t, name: i === 2 ? "notes" : String(i + 1), named: i === 2 })) };
-  const panes = ["b1", "b2", "b3"].map((tab, i) => ({ pane: `q${i}`, tab, cwd: "/w/api", program: shell, focused: false }));
-  assert.deepEqual(tabPills(space, panes).map((p) => p.label), ["Terminal Profile", "Terminal Profile 2", "notes"]);
-  // The space's name changes: the unnamed tabs follow it; the renamed one stays.
-  assert.deepEqual(tabPills({ ...space, name: "api" }, panes).map((p) => p.label), ["api", "api 2", "notes"]);
+test("the sidebar row shows the folder an unnamed space is in now; a named space keeps its name", () => {
+  const names = (spaces, panes) => findAll(spacesView({ spaces, panes, home: "/home/ann" }), (n) => n.kind === "name").map((n) => n.attrs.text);
+  assert.deepEqual(names([twoTabs({ active: true })], twoTabPanes()), ["src"]);
+  assert.deepEqual(names([twoTabs({ active: true, name: "Work", named: true })], twoTabPanes()), ["Work"]);
+  assert.deepEqual(names([twoTabs({ active: true })], [{ pane: "h", tab: "b2", cwd: "/home/ann", focused: true }]), ["~"]);
 });
 
-test("New space here: unnamed; a renamed current space's name carries over on the same machine only", () => {
+test("New space and New space here make unnamed spaces (they follow their folder)", () => {
   const r = recorder();
-  const current = { name: "Terminal Profile", named: true, machine: null };
-  newSpaceHere({ machine: "devbox" }, r, { current });
-  newSpaceHere({ machine: null }, r, { current });
-  newSpaceHere({ machine: null }, r, { current: { ...current, named: false } });
+  newSpace(r);
+  newSpaceHere({ machine: "devbox" }, r);
   newSpaceHere({ machine: null }, r);
   assert.deepEqual(runs(r), [
+    { name: "space.new", args: {} },
     { name: "space.new", args: { machine: "devbox" } },
-    { name: "space.new", args: { machine: "", name: "Terminal Profile" } },
-    { name: "space.new", args: { machine: "" } },
     { name: "space.new", args: { machine: "" } },
   ]);
 });
@@ -100,18 +112,6 @@ test("Work on it names the agent's tab, unique in the space", () => {
   const r = recorder();
   workOnIt({ path: "docs/specs/pending/x.md" }, { space, repo: "/w/repo", agents: [agent] }, r);
   assert.equal(r.calls[0].args.name, "Claude Code 2");
-});
-
-test("the New space button keeps Herdr's default machine; a renamed current space's name carries over", () => {
-  const r = recorder();
-  newSpace(r, { current: { name: "Terminal Profile", named: true, machine: null } });
-  newSpace(r, { current: { name: "api", named: false, machine: null } });
-  newSpace(r);
-  assert.deepEqual(runs(r), [
-    { name: "space.new", args: { name: "Terminal Profile" } },
-    { name: "space.new", args: {} },
-    { name: "space.new", args: {} },
-  ]);
 });
 
 test("Work on it twice in a row: the second tab is numbered (tabs read when clicked)", () => {
